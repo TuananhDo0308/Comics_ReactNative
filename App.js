@@ -8,6 +8,8 @@ import SignUpForm from './src/screens/SignIn/SignUpForm';
 import Home from './src/screens/Home/Home';
 import Search from './src/screens/Home/Search';
 import Profile from './src/screens/Home/Profile';
+import ChapterPages from './src/screens/Home/ChapterPage';
+import Chapters from './src/screens/Home/Chapter';
 
 const Stack = createStackNavigator();
 
@@ -32,6 +34,9 @@ function StackNavigator() {
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignInForm" component={SignInForm} />
       <Stack.Screen name="SignUpForm" component={SignUpForm} />
+      <Stack.Screen name="Chapters" component={Chapters} />
+      <Stack.Screen name="ChapterPages" component={ChapterPages} />
+
       <Stack.Screen 
         name="Home" 
         component={Home} 

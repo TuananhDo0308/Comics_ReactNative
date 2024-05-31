@@ -1,76 +1,93 @@
-import React, { useRef } from 'react';
-import { View, Text, Dimensions, Platform, Image, ImageBackground, StyleSheet, SafeAreaView, ScrollView, StatusBar } from 'react-native';
-import { useNavigationState } from '@react-navigation/native';
-
-const { width } = Dimensions.get('window');
-
-import HighlightComic from '../../components/HighlightComic';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, FlatList, StyleSheet, StatusBar, TouchableOpacity, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
 
 const Home = () => {
-  const currentRoute = useNavigationState(state => state.routes[state.index].name);
-  const passwordInputRef = useRef(null);  
+  const [mangaList, setMangaList] = useState([]);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    fetch('https://api.mangadex.org/manga')
+      .then(response => response.json())
+      .then(data => {
+        setMangaList(data.data);
+      })
+      .catch(error => {
+        console.error('Error fetching manga:', error);
+      });
+  }, []);
+
+  const handlePress = (mangaId) => {
+    navigation.navigate('Chapters', { mangaId });
+  };
 
   return (
-    <ImageBackground 
-      source={require('../../assets/img5.jpg')} 
-      style={styles.background}
-    >
-      <StatusBar translucent background="rgba(29, 29, 29, 0.9)"  backgroundColor="rgba(29, 29, 29, 0.9)" />
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          <View style={styles.topBlur}/>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
-            <HighlightComic/>
-            <Image source={require('../../assets/img5.jpg')} style={styles.image}></Image>
-            <Text style={styles.contentText}>Your Content Here</Text>
-          </ScrollView>
-          <HomeBottomNavigation currentRoute={currentRoute} />        
-        </View>
-      </View>
-    </ImageBackground>
+    <View style={styles.container}>
+      <StatusBar translucent backgroundColor="rgba(29, 29, 29, 0.9)" />
+      <FlatList
+        data={mangaList}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => handlePress(item.id)}>
+            <View style={styles.mangaItem}>
+              <Image
+                source={{ uri: `https://uploads.mangadex.org/covers/:manga-id/:cover-filename` }}
+                style={styles.coverImage}
+              />
+              <View style={styles.infoContainer}>
+                <Text style={styles.title}>{item.attributes.title.en}</Text>
+                <Text style={styles.author}>{item.attributes.author}</Text>
+                <Text style={styles.genre}>{item.attributes.tags.map(tag => tag.attributes.name.en).join(', ')}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.scrollContent}
+      />
+      <HomeBottomNavigation currentRoute="Home" />
+    </View>
   );
 };
 
 export default Home;
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  topBlur:{
-    top: 0,
-    width: width,
-    position: 'absolute',
-    backgroundColor: 'rgba(29, 29, 29, 0.9)', 
-    height: Platform.OS === 'ios' ? 44 : StatusBar.currentHeight, // Adjust height based on platform
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(29, 29, 29, 0.95)', // Semi-transparent background for blur effect
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   container: {
     flex: 1,
-    width: '100%',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(29, 29, 29, 0.95)',
   },
   scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: Platform.OS === 'ios' ? 44 : StatusBar.currentHeight,
+    paddingBottom: 60, // Adjust this value based on the height of the bottom navigation
   },
-  content: {
+  mangaItem: {
+    flexDirection: 'row',
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  coverImage: {
+    width: 100,
+    height: 150,
+    marginRight: 10,
+  },
+  infoContainer: {
     flex: 1,
+    justifyContent: 'center',
   },
-  image: {
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
-  contentText: {
-    color: 'white',
-    fontSize: 24,
-    textAlign: 'center',
+  author: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  genre: {
+    fontSize: 14,
+    color: 'gray',
   },
 });
