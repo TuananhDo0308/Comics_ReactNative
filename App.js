@@ -1,20 +1,60 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
 
-export default function App() {
+import SignIn from './src/screens/SignIn/SignIn';
+import SignInForm from './src/screens/SignIn/SignInForm';
+import SignUpForm from './src/screens/SignIn/SignUpForm';
+import Home from './src/screens/Home/Home';
+import Search from './src/screens/Home/Search';
+import Profile from './src/screens/Home/Profile';
+
+const Stack = createStackNavigator();
+
+const noSlideTransition = {
+  gestureDirection: 'horizontal',
+  transitionSpec: {
+    open: { animation: 'timing', config: { duration: 0 } },
+    close: { animation: 'timing', config: { duration: 0 } },
+  },
+  cardStyleInterpolator: ({ current, next, layouts }) => {
+    return {
+      cardStyle: {
+        transform: [],
+      },
+    };
+  },
+};
+
+function StackNavigator() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="SignIn" component={SignIn} />
+      <Stack.Screen name="SignInForm" component={SignInForm} />
+      <Stack.Screen name="SignUpForm" component={SignUpForm} />
+      <Stack.Screen 
+        name="Home" 
+        component={Home} 
+        options={noSlideTransition} // Disable slide animation for Home
+      />
+      <Stack.Screen 
+        name="Search" 
+        component={Search} 
+        options={noSlideTransition} // Disable slide animation for Search
+      />
+      <Stack.Screen 
+        name="Profile" 
+        component={Profile} 
+        options={noSlideTransition} // Disable slide animation for Search
+      />
+    </Stack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <NavigationContainer>
+      <StackNavigator />
+    </NavigationContainer>
+  );
+}
