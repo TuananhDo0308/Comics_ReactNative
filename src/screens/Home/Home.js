@@ -11,11 +11,23 @@ const Home = () => {
     fetch('https://api.mangadex.org/manga')
       .then(response => response.json())
       .then(data => {
-        setMangaList(data.data);
+        const mangaData = data.data;
+        // Fetch cover art for each manga
+        const fetchCovers = mangaData.map(manga => {
+          const coverId = manga.relationships.find(rel => rel.type === 'cover_art').id;
+          return fetch(`https://api.mangadex.org/cover/${coverId}`)
+            .then(response => response.json())
+            .then(coverData => ({
+              ...manga,
+              coverFileName: coverData.data.attributes.fileName
+            }));
+        });
+
+        Promise.all(fetchCovers)
+          .then(mangaListWithCovers => setMangaList(mangaListWithCovers))
+          .catch(error => console.error('Error fetching covers:', error));
       })
-      .catch(error => {
-        console.error('Error fetching manga:', error);
-      });
+      .catch(error => console.error('Error fetching manga:', error));
   }, []);
 
   const handlePress = (mangaId) => {
@@ -31,7 +43,7 @@ const Home = () => {
           <TouchableOpacity onPress={() => handlePress(item.id)}>
             <View style={styles.mangaItem}>
               <Image
-                source={{ uri: `https://uploads.mangadex.org/covers/:manga-id/:cover-filename` }}
+                source={{ uri: `https://uploads.mangadex.org/covers/${item.id}/${item.coverFileName}` }}
                 style={styles.coverImage}
               />
               <View style={styles.infoContainer}>
