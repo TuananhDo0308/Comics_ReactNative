@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput,Dimensions,Platform, TouchableOpacity, Image, StyleSheet, SafeAreaView} from 'react-native';
+import { View, Text, TextInput,Dimensions,Platform, TouchableOpacity, Image, StyleSheet, SafeAreaView, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { firebase } from '../../../firebaseConfig';
 
 const { width } = Dimensions.get('window');
 
@@ -9,6 +10,28 @@ const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
   const passwordInputRef = useRef(null);  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const signUp = () => {
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+    firebase.auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        Alert.alert('Success', 'Sign Up Success', [
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
+        ]);
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+      })
+      .catch((error) => {
+        Alert.alert('Error', error.message);
+      });
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -19,6 +42,8 @@ const SignUpForm = () => {
           placeholder="Email or phone number"
           placeholderTextColor="#aaa"
           keyboardType="email-address" 
+          value={email}
+          onChangeText={setEmail}
         />
         <View style={styles.passwordContainer}>
           <TextInput
@@ -27,6 +52,8 @@ const SignUpForm = () => {
             placeholderTextColor="#aaa"
             secureTextEntry={!showPassword}
             ref={passwordInputRef}  
+            value={password}
+            onChangeText={setPassword}
           />
           <TouchableOpacity 
             onPress={() => setShowPassword(!showPassword)} 
@@ -43,6 +70,8 @@ const SignUpForm = () => {
             placeholderTextColor="#aaa"
             secureTextEntry={true}
             ref={passwordInputRef}  
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
           />
         </View>
           <Text style={styles.forgotPasswordText}>By clicking the Register button, you agree to the public offer</Text>
@@ -51,9 +80,9 @@ const SignUpForm = () => {
       
       <View style={styles.signInContainer}>
           <Text style={styles.sigIn_title}> Register</Text>
-          <TouchableOpacity style={styles.signInButton}>
+          <TouchableOpacity style={styles.signInButton} onPress={signUp}>
             <Image style={styles.signInButtonIcon} source={require('../../assets/icon/nextIcon.png')} />
-        </TouchableOpacity>
+          </TouchableOpacity>
       </View>
 
       <View style={styles.otherSignIn}>
