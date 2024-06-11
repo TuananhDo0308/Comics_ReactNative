@@ -4,32 +4,19 @@ import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
 import { fetchComicsList } from '../../api/api';
-// import { fetchHotMangaList,fetchMangaList } from '../../api/api';
 import ComicItem from '../../components/HighlightComic';
+import ComicGerne from '../../components/ComicGerne';
 import { BlurView } from 'expo-blur'
-
+import MyCarousel from '../../components/continueRead';
 const { width, height } = Dimensions.get('window');
 
 const Home = () => {
-  // const [hotMangaList, setHotMangaList] = useState([]);
-  // const [currentMangaId, setCurrentMangaId] = useState(null);
   const [comicsList, setComicsList] = useState([]);
   const [currentComicId, setCurrentComicId] = useState(null);
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
   
-  // useEffect(() => {
-  //   fetchHotMangaList().then(mangaList => {
-  //     setHotMangaList(mangaList);
-  //     if (mangaList.length > 0) {
-  //       setCurrentMangaId(mangaList[0].id);
-  //     }
-  //   });
-  //   });
-  
-  // const handlePress = (mangaId) => {
-  //   navigation.navigate('Chapters', { mangaId });
-  // };
+
 
   useEffect(() => {
     fetchComicsList().then(comics => {
@@ -62,11 +49,6 @@ const Home = () => {
     extrapolate: 'clamp'
   });
 
-  // const handleViewableItemsChanged = useRef(({ viewableItems }) => {
-  //   if (viewableItems.length > 0) {
-  //     setCurrentMangaId(viewableItems[0].item.id);
-  //   }
-  // }).current;
 
   const handleViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -80,7 +62,7 @@ const Home = () => {
 
   return (
     <ImageBackground 
-      source={require('../../assets/img1.jpg')} 
+      source={require('../../assets/background.jpg')} 
       style={styles.background}
     >
       <View style={styles.container}>
@@ -104,13 +86,12 @@ const Home = () => {
           <View style={styles.hotTrend}>
             <FlatList
               data={comicsList}
-              // renderItem={({ item }) => <ComicItem item={item}/>}
               renderItem={({ item }) => item ? <ComicItem item={item} /> : null}
               horizontal
               snapToAlignment="center"
+              showsHorizontalScrollIndicator={false}
               snapToInterval={width}
               decelerationRate="fast"
-              showsHorizontalScrollIndicator={false}
               keyExtractor={item => item.id}
               contentContainerStyle={styles.horizontalScroll}
               pagingEnabled
@@ -121,6 +102,29 @@ const Home = () => {
               <Text style={styles.readButtonText}>Read</Text>
             </TouchableOpacity>
           </View>
+          <View style={styles.continueRead}>
+            <Text style={styles.continueReadTitle}>
+              CONTINUE READING
+            </Text>
+            <MyCarousel data={comicsList} />
+          </View>
+          <View style={styles.continueRead}>
+            <Text style={styles.continueReadTitle}>
+              CONTINUE READING
+            </Text>
+            <FlatList
+                data={comicsList}
+                renderItem={({ item }) => item ? <ComicGerne item={item} /> : null}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                decelerationRate="fast"
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.horizontalScroll2}
+                pagingEnabled
+              />
+          </View>
+          
+          
           
         </Animated.ScrollView>
         <Animated.View style={[styles.bottomNav, { transform: [{ translateY: bottomNavTranslateY }] }]}>
@@ -141,12 +145,12 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(20, 20, 20, 0.7)', 
+    backgroundColor: 'rgba(20, 20, 20, 0.9)', 
     justifyContent: 'center',
     alignItems: 'center',
   },
   hotTrend:{
-    height: height , // Chiều cao của vùng chứa FlatList đầu tiên và nút Read
+    height: height , 
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -156,8 +160,11 @@ const styles = StyleSheet.create({
   horizontalScroll: {
     marginTop: Platform.OS === 'ios' ? 44 +80 : StatusBar.currentHeight + 80,
   },
+  horizontalScroll2: {
+    width:width,
+  },
   safe:{
-    backgroundColor: 'rgba(0,0, 0, 0.9)', 
+    backgroundColor: 'rgba(0,0, 0, 0.85)', 
     position: 'absolute',
     top: 0,
     zIndex: 16,
@@ -204,14 +211,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  mangaItemVertical: {
-    flexDirection: 'row',
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
+  
   coverImageVertical: {
     width: 100,
     height: 150,
@@ -221,18 +221,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  author: {
-    fontSize: 16,
-    color: 'gray',
-  },
-  genre: {
-    fontSize: 14,
-    color: 'gray',
-  },
+  
   readButton: {
     backgroundColor: '#ff4b25',
     width: 170,
@@ -260,5 +249,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
   },
-  
+  continueRead:{
+    flexDirection:'column',
+    alignItems:'flex-start',
+    justifyContent:'flex-start',
+    width:width-20,
+    marginVertical:20,
+    marginHorizontal:10,
+  },
+  continueReadTitle:{
+    fontSize:16,
+    fontWeight:'500',
+    color:'grey',
+    marginLeft:5
+  },
 });

@@ -4,7 +4,7 @@ import { BlurView } from 'expo-blur';
 const { width, height } = Dimensions.get('window');
 
 
-const ComicItem = ({ item }) => {
+const ComicGerne = ({ item }) => {
 
 
   return (
@@ -14,38 +14,28 @@ const ComicItem = ({ item }) => {
           source={{ uri: item.ImgURL }}
           style={styles.coverImage}
         />
-        <BlurView intensity={30} style={[styles.tagContainer]}>
-          <Text style={styles.tag}>Tag</Text>
-        </BlurView>
       </View>
       <View style={styles.comicInfo}>
         <Text style={styles.comicTitle}>{item.Title}</Text>
-        <Text style={styles.comicAuthor}>{item.Author}</Text>
       </View>
     </View>
   );
 };
 
-export default ComicItem;
+export default ComicGerne;
 
 const styles = StyleSheet.create({
   comicItem: {
     backgroundColor: 'transparent',
     borderRadius: 15,
-    display: 'flex',
-    marginHorizontal: 20,
-    gap:20,
-    alignItems: 'center',
-    justifyContent: 'center',
     flexDirection: 'column',
     padding: 10,
-    height: height-250,
-    width: width - 40,
+    height:250,
+    width:150,
   },
   imageContainer: {
-    width: '90%',
-    height: '90%',
     borderRadius: 30,
+    flex:1,
     alignItems: 'center',
     shadowOpacity: 0.3,
     justifyContent: 'flex-end',
@@ -55,35 +45,18 @@ const styles = StyleSheet.create({
   coverImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 30,
+    borderRadius:10,
   },
   comicInfo: {
-    alignItems: 'center',
+    marginTop:10,
+    alignItems: 'flex-start',
   },
   comicTitle: {
     color: 'white',
     alignItems:'center',
     justifyContent:'center',
     fontSize: 18,
-    fontWeight: 'bold',
   },
-  comicAuthor: {
-    color: 'gray',
-    fontSize: 14,
-    marginVertical: 5,
-  },
-  tagContainer: {
-    bottom: 20, 
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    position: 'absolute',
-    flexDirection: 'row',
-    paddingHorizontal: 10
-  },
-  tag: {
-    color: 'white',
-    fontSize: 12,
-    borderRadius: 50,    
-    paddingVertical: 10,
-  },
+  
   
 });

@@ -11,13 +11,16 @@ const Profile = () => {
   const passwordInputRef = useRef(null);  
   return (
     <ImageBackground 
-      source={require('../../assets/img1.jpg')} 
+      source={require('../../assets/background.jpg')} 
       style={styles.background}
     >
       <View style={styles.overlay}>
         <SafeAreaView style={styles.container}>
           <View style={styles.content}>
             {/* Your content here */}
+            <View style={styles.infoSpace}>
+              
+            </View>
             <Text style={styles.contentText}>Your Content Here</Text>
           </View>
           <HomeBottomNavigation currentRoute={currentRoute} />        
@@ -43,6 +46,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: 'rgba(20, 20, 20, 0.9)', 
     width: '100%',
     justifyContent: 'flex-end',
   },

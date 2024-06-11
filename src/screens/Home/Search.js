@@ -11,13 +11,13 @@ const Search = () => {
   const passwordInputRef = useRef(null);  
   return (
     <ImageBackground 
-      source={require('../../assets/img3.jpg')} 
-      style={styles.background}
+    source={require('../../assets/background.jpg')} 
+    style={styles.background}
     >
       <View style={styles.overlay}>
         <SafeAreaView style={styles.container}>
+          
           <View style={styles.content}>
-            {/* Your content here */}
             <Text style={styles.contentText}>Your Content Here</Text>
 
           </View>
@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
+    backgroundColor: 'rgba(20, 20, 20, 0.9)', 
     justifyContent: 'flex-end',
   },
   content: {
