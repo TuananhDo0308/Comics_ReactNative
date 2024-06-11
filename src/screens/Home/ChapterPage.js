@@ -1,6 +1,10 @@
+// ChapterPages.js
 import React, { useEffect, useState } from 'react';
-import { View, Image, FlatList, StyleSheet } from 'react-native';
+import { View, Image, FlatList, StyleSheet, Dimensions } from 'react-native';
 import { useRoute } from '@react-navigation/native';
+import { fetchChapterPages } from '../../api/api';
+
+const { width } = Dimensions.get('window');
 
 const ChapterPages = () => {
   const route = useRoute();
@@ -8,18 +12,7 @@ const ChapterPages = () => {
   const [pages, setPages] = useState([]);
 
   useEffect(() => {
-    fetch(`https://api.mangadex.org/at-home/server/${chapterId}`)
-      .then(response => response.json())
-      .then(data => {
-        const baseUrl = data.baseUrl;
-        const hash = data.chapter.hash;
-        const pageFiles = data.chapter.data;
-        const pageUrls = pageFiles.map(page => `${baseUrl}/data/${hash}/${page}`);
-        setPages(pageUrls);
-      })
-      .catch(error => {
-        console.error('Error fetching chapter pages:', error);
-      });
+    fetchChapterPages(chapterId).then(setPages);
   }, [chapterId]);
 
   return (
@@ -27,7 +20,7 @@ const ChapterPages = () => {
       <FlatList
         data={pages}
         renderItem={({ item }) => (
-          <Image source={{ uri: item }} style={styles.pageImage} />
+          <Image source={{ uri: item }} style={styles.pageImage} resizeMode="contain" />
         )}
         keyExtractor={(item, index) => index.toString()}
       />
@@ -43,8 +36,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   pageImage: {
-    width: '100%',
+    width: width,
     height: undefined,
-    aspectRatio: 1,
+    aspectRatio: 0.75, // Bạn có thể điều chỉnh aspectRatio theo tỷ lệ của ảnh
   },
 });

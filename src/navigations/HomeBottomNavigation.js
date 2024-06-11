@@ -69,7 +69,7 @@ const HomeBottomNavigation = ({ currentRoute }) => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 35,
     width: width - 80,
     alignSelf: 'center',
     justifyContent: 'center',

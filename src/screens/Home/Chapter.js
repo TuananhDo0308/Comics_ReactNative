@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+
+const { width, height } = Dimensions.get('window');
 
 const Chapters = () => {
   const route = useRoute();
   const { mangaId } = route.params;
   const [chapters, setChapters] = useState([]);
-  const navigation = useNavigation();
+  const navigation=useNavigation()
 
   useEffect(() => {
     fetch(`https://api.mangadex.org/manga/${mangaId}/feed?limit=500`)
@@ -28,10 +30,13 @@ const Chapters = () => {
       <FlatList
         data={chapters}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item.id)}>
-            <View style={styles.chapterItem}>
-              <Text style={styles.chapterTitle}>Chapter {item.attributes.chapter}: {item.attributes.title}</Text>
-            </View>
+          <TouchableOpacity onPress={() => handlePress(item.id)} style={styles.chapterItem}>
+            <Text style={styles.chapterTitle}>Chapter {item.attributes.chapter}: {item.attributes.title}</Text>
+            {item.attributes.background ? (
+              <Image source={{ uri: item.attributes.background }} style={styles.chapterBackground} />
+            ) : (
+              <Text style={styles.noBackground}>No background available</Text>
+            )}
           </TouchableOpacity>
         )}
         keyExtractor={item => item.id}
@@ -58,5 +63,16 @@ const styles = StyleSheet.create({
   },
   chapterTitle: {
     fontSize: 18,
+  },
+  chapterBackground: {
+    width: width - 20,
+    height: height * 0.4,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  noBackground: {
+    marginTop: 10,
+    fontStyle: 'italic',
+    color: 'gray',
   },
 });
