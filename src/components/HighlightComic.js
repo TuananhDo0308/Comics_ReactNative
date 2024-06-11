@@ -4,28 +4,46 @@ import { BlurView } from 'expo-blur';
 const { width, height } = Dimensions.get('window');
 
 const ComicItem = ({ item }) => {
-  // Lấy 1 thể loại
-  const tagToDisplay = item.tags[0];
-  
-  // Lấy tên tác giả
-
   return (
-    <View style={styles.comicItem} >
+    <View style={styles.comicItem}>
       <View style={styles.imageContainer}>
         <Image
-          source={{ uri: `https://uploads.mangadex.org/covers/${item.id}/${item.coverFileName}` }}
+          source={{ uri: item.ImgURL }}
           style={styles.coverImage}
         />
-        <BlurView intensity={30} style={[styles.tagContainer]}>
+        <Text style={styles.comicTitle}>{item.Title}</Text>
+        <Text style={styles.comicAuthor}>{item.Author}</Text>
+        {/* <BlurView intensity={30} style={[styles.tagContainer]}>
           <Text style={styles.tag}>{tagToDisplay}</Text>
-        </BlurView>
-      </View>
-      <View style={styles.comicInfo}>
-        <Text style={styles.comicTitle}>{item.attributes.title.en}</Text>
+        </BlurView> */}
       </View>
     </View>
   );
 };
+
+// const ComicItem = ({ item }) => {
+//   // Lấy 1 thể loại
+//   const tagToDisplay = item.tags[0];
+  
+//   // Lấy tên tác giả
+
+//   return (
+//     <View style={styles.comicItem} >
+//       <View style={styles.imageContainer}>
+//         <Image
+//           source={{ uri: `https://uploads.mangadex.org/covers/${item.id}/${item.coverFileName}` }}
+//           style={styles.coverImage}
+//         />
+//         <BlurView intensity={30} style={[styles.tagContainer]}>
+//           <Text style={styles.tag}>{tagToDisplay}</Text>
+//         </BlurView>
+//       </View>
+//       <View style={styles.comicInfo}>
+//         <Text style={styles.comicTitle}>{item.attributes.title.en}</Text>
+//       </View>
+//     </View>
+//   );
+// };
 
 export default ComicItem;
 

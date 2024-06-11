@@ -3,32 +3,45 @@ import { View, Text, Image, Animated, StyleSheet, StatusBar, ImageBackground, Fl
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
-import { fetchHotMangaList,fetchMangaList } from '../../api/api';
+import { fetchComicsList } from '../../api/api';
+// import { fetchHotMangaList,fetchMangaList } from '../../api/api';
 import ComicItem from '../../components/HighlightComic';
 import { BlurView } from 'expo-blur'
 
 const { width, height } = Dimensions.get('window');
 
 const Home = () => {
-  const [hotMangaList, setHotMangaList] = useState([]);
-  const [currentMangaId, setCurrentMangaId] = useState(null);
+  // const [hotMangaList, setHotMangaList] = useState([]);
+  // const [currentMangaId, setCurrentMangaId] = useState(null);
+  const [comicsList, setComicsList] = useState([]);
+  const [currentComicId, setCurrentComicId] = useState(null);
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
   
+  // useEffect(() => {
+  //   fetchHotMangaList().then(mangaList => {
+  //     setHotMangaList(mangaList);
+  //     if (mangaList.length > 0) {
+  //       setCurrentMangaId(mangaList[0].id);
+  //     }
+  //   });
+  //   });
+  
+  // const handlePress = (mangaId) => {
+  //   navigation.navigate('Chapters', { mangaId });
+  // };
+
   useEffect(() => {
-    fetchHotMangaList().then(mangaList => {
-      setHotMangaList(mangaList);
-      if (mangaList.length > 0) {
-        setCurrentMangaId(mangaList[0].id);
+    fetchComicsList().then(comics => {
+      setComicsList(comics);
+      if (comics.length > 0) {
+        setCurrentComicId(comics[0].id);
       }
     });
+  }, []);
 
-    
-    });
-  
-
-  const handlePress = (mangaId) => {
-    navigation.navigate('Chapters', { mangaId });
+  const handlePress = (comicId) => {
+    navigation.navigate('Chapters', { comicId });
   };
 
   const topNavTranslateY = scrollY.interpolate({
@@ -49,9 +62,15 @@ const Home = () => {
     extrapolate: 'clamp'
   });
 
+  // const handleViewableItemsChanged = useRef(({ viewableItems }) => {
+  //   if (viewableItems.length > 0) {
+  //     setCurrentMangaId(viewableItems[0].item.id);
+  //   }
+  // }).current;
+
   const handleViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
-      setCurrentMangaId(viewableItems[0].item.id);
+      setCurrentComicId(viewableItems[0].item.id);
     }
   }).current;
 
@@ -84,8 +103,9 @@ const Home = () => {
         >
           <View style={styles.hotTrend}>
             <FlatList
-              data={hotMangaList}
-              renderItem={({ item }) => <ComicItem item={item}/>}
+              data={comicsList}
+              // renderItem={({ item }) => <ComicItem item={item}/>}
+              renderItem={({ item }) => item ? <ComicItem item={item} /> : null}
               horizontal
               snapToAlignment="center"
               snapToInterval={width}
@@ -97,7 +117,7 @@ const Home = () => {
               onViewableItemsChanged={handleViewableItemsChanged}
               viewabilityConfig={viewabilityConfig}
             />
-            <TouchableOpacity style={styles.readButton} onPress={() => handlePress(currentMangaId)}>
+            <TouchableOpacity style={styles.readButton} onPress={() => handlePress(currentComicId)}>
               <Text style={styles.readButtonText}>Read</Text>
             </TouchableOpacity>
           </View>
