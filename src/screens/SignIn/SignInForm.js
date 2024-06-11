@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput,Dimensions,Platform, TouchableOpacity, Image, StyleSheet, SafeAreaView} from 'react-native';
+import { View, Text, TextInput,Dimensions,Platform, TouchableOpacity, Image, StyleSheet, SafeAreaView, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { firebase } from '../../../firebaseConfig';
 
 const { width } = Dimensions.get('window');
 
@@ -9,6 +10,22 @@ const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
   const passwordInputRef = useRef(null);  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const signIn = () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+    firebase.auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(() => {
+        navigation.navigate('Home')
+      })
+      .catch((error) => {
+        Alert.alert('Error', 'Your email or password is incorrect');
+      });
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -19,6 +36,8 @@ const SignInForm = () => {
           placeholder="Email or phone number"
           placeholderTextColor="#aaa"
           keyboardType="email-address" 
+          value={email}
+          onChangeText={setEmail}
         />
         <View style={styles.passwordContainer}>
           <TextInput
@@ -26,7 +45,9 @@ const SignInForm = () => {
             placeholder="Password"
             placeholderTextColor="#aaa"
             secureTextEntry={!showPassword}
-            ref={passwordInputRef}  
+            ref={passwordInputRef}
+            value={password}
+            onChangeText={setPassword}
           />
           <TouchableOpacity 
             onPress={() => setShowPassword(!showPassword)} 
@@ -43,7 +64,7 @@ const SignInForm = () => {
       
       <View style={styles.signInContainer}>
           <Text style={styles.sigIn_title}> Sign In</Text>
-          <TouchableOpacity style={styles.signInButton} onPress={() => navigation.navigate('Home')}>
+          <TouchableOpacity style={styles.signInButton} onPress={signIn}>
             <Image style={styles.signInButtonIcon} source={require('../../assets/icon/nextIcon.png')} />
         </TouchableOpacity>
       </View>
