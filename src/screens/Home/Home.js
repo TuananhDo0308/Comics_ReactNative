@@ -73,7 +73,9 @@ const Home = () => {
         <Animated.View style={[styles.topNav, { transform: [{ translateY: topNavTranslateY }] }]}>
           <Image style={styles.navLogo} source={require('../../assets/imglogo.png')} />
           <Image style={styles.navLogotext}  source={require('../../assets/applogo.png')} />
-          <Image style={styles.navProfile} source={require('../../assets/img1.jpg')}/>
+          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+            <Image style={styles.navProfile} source={require('../../assets/img1.jpg')}/>
+          </TouchableOpacity>
         </Animated.View>
         <Animated.ScrollView
           contentContainerStyle={styles.scrollContent}

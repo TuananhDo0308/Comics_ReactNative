@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 
 import SignIn from './src/screens/SignIn/SignIn';
@@ -36,7 +36,6 @@ function StackNavigator() {
       <Stack.Screen name="SignUpForm" component={SignUpForm} />
       <Stack.Screen name="Chapters" component={Chapters} />
       <Stack.Screen name="ChapterPages" component={ChapterPages} />
-
       <Stack.Screen 
         name="Home" 
         component={Home} 
@@ -50,7 +49,7 @@ function StackNavigator() {
       <Stack.Screen 
         name="Profile" 
         component={Profile} 
-        options={noSlideTransition} // Disable slide animation for Search
+        options={noSlideTransition} // Disable slide animation for Profile
       />
     </Stack.Navigator>
   );

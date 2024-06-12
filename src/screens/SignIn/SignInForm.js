@@ -20,7 +20,7 @@ const SignInForm = () => {
     firebase.auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
-        navigation.navigate('Home')
+        navigation.replace('Home')
       })
       .catch((error) => {
         Alert.alert('Error', 'Your email or password is incorrect');
