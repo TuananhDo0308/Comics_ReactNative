@@ -63,24 +63,24 @@ const Profile = () => {
                   renderItem={({ item }) => item ? <ComicGerne item={item} /> : null}
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  decelerationRate="fast"
+                  decelerationRate="normal"
                   keyExtractor={item => item.id}
                   contentContainerStyle={styles.horizontalScroll2}
-                  pagingEnabled
+                  initialNumToRender={10}
                 />
             </View>
 
             <View style={styles.continueRead}>
-              <Text style={styles.continueReadTitle}>CONTINUE READING</Text>
+              <Text style={styles.continueReadTitle}>FAVOURITE</Text>
               <FlatList
                   data={comicsList}
                   renderItem={({ item }) => item ? <ComicGerne item={item} /> : null}
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  decelerationRate="fast"
+                  decelerationRate="normal"
                   keyExtractor={item => item.id}
                   contentContainerStyle={styles.horizontalScroll2}
-                  pagingEnabled
+                  initialNumToRender={10}
                 />
             </View>
           </ScrollView>
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(200, 200, 200, 0.5)', 
   },
   horizontalScroll2: {
-    width:width,
+    paddingLeft: 10, // Thêm khoảng cách giữa các mục
   },
   continueRead:{
     flexDirection:'column',

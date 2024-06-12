@@ -3,11 +3,12 @@ import { View, Text, Image, Animated, StyleSheet, StatusBar, ImageBackground, Fl
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
-import { fetchComicsList, fetchGenresList, fetchChapters } from '../../api/api';
+import { fetchComicsList, fetchGenresList } from '../../api/api';
 import ComicItem from '../../components/HighlightComic';
 import ComicGerne from '../../components/ComicGerne';
-import { BlurView } from 'expo-blur'
+import { BlurView } from 'expo-blur';
 import MyCarousel from '../../components/continueRead';
+
 const { width, height } = Dimensions.get('window');
 
 const Home = () => {
@@ -16,8 +17,6 @@ const Home = () => {
   const [genresList, setGenresList] = useState([]);
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
-  
-
 
   useEffect(() => {
     fetchComicsList().then(comics => {
@@ -26,7 +25,6 @@ const Home = () => {
         setCurrentComicId(comics[0].id);
       }
     });
-
 
     fetchGenresList().then(genres => {
       setGenresList(genres);
@@ -37,30 +35,23 @@ const Home = () => {
     navigation.navigate('Chapters', { comicId });
   };
 
-  // useEffect(() => {
-  //   fetchGenresList().then(genres => {
-  //     setGenresList(genres);
-  //   });
-  // }, []);
-
   const topNavTranslateY = scrollY.interpolate({
     inputRange: [0, 150],
     outputRange: [0, -90], // Trượt lên 90 pixel
-    extrapolate: 'clamp'
+    extrapolate: 'clamp',
   });
 
   const bottomNavTranslateY = scrollY.interpolate({
     inputRange: [0, 150],
     outputRange: [100, 0], // Trượt xuống 100 pixel
-    extrapolate: 'clamp'
+    extrapolate: 'clamp',
   });
 
   const safeHeight = scrollY.interpolate({
     inputRange: [0, 150],
-    outputRange: [0, Constants.statusBarHeight], 
-    extrapolate: 'clamp'
+    outputRange: [0, Constants.statusBarHeight],
+    extrapolate: 'clamp',
   });
-
 
   const handleViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -69,12 +60,12 @@ const Home = () => {
   }).current;
 
   const viewabilityConfig = {
-    itemVisiblePercentThreshold: 50
+    itemVisiblePercentThreshold: 50,
   };
 
   return (
-    <ImageBackground 
-      source={require('../../assets/background.jpg')} 
+    <ImageBackground
+      source={require('../../assets/background.jpg')}
       style={styles.background}
     >
       <View style={styles.container}>
@@ -84,9 +75,9 @@ const Home = () => {
         </Animated.View>
         <Animated.View style={[styles.topNav, { transform: [{ translateY: topNavTranslateY }] }]}>
           <Image style={styles.navLogo} source={require('../../assets/imglogo.png')} />
-          <Image style={styles.navLogotext}  source={require('../../assets/applogo.png')} />
+          <Image style={styles.navLogotext} source={require('../../assets/applogo.png')} />
           <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-            <Image style={styles.navProfile} source={require('../../assets/img1.jpg')}/>
+            <Image style={styles.navProfile} source={require('../../assets/img1.jpg')} />
           </TouchableOpacity>
         </Animated.View>
         <Animated.ScrollView
@@ -100,7 +91,7 @@ const Home = () => {
           <View style={styles.hotTrend}>
             <FlatList
               data={comicsList}
-              renderItem={({ item }) => item ? <ComicItem item={item}/> : null}
+              renderItem={({ item }) => item ? <ComicItem item={item} /> : null}
               horizontal
               snapToAlignment="center"
               showsHorizontalScrollIndicator={false}
@@ -133,19 +124,19 @@ const Home = () => {
                 </Text>
                 <FlatList
                   data={item.comics}
-                  renderItem={({ item }) => item ? <ComicGerne item={item}/> : null}
+                  renderItem={({ item }) => item ? <ComicGerne item={item} /> : null}
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   decelerationRate="fast"
                   keyExtractor={item => item.id}
                   contentContainerStyle={styles.horizontalScroll2}
-                  pagingEnabled
+                  initialNumToRender={10}
                 />
               </View>
             )}
             keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingBottom: 10 }} // Thêm khoảng cách dưới
           />
-
         </Animated.ScrollView>
         <Animated.View style={[styles.bottomNav, { transform: [{ translateY: bottomNavTranslateY }] }]}>
           <HomeBottomNavigation currentRoute="Home" />
@@ -165,12 +156,12 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(20, 20, 20, 0.9)', 
+    backgroundColor: 'rgba(20, 20, 20, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  hotTrend:{
-    height: height , 
+  hotTrend: {
+    height: height,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -178,23 +169,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   horizontalScroll: {
-    marginTop: Platform.OS === 'ios' ? 44 +80 : StatusBar.currentHeight + 80,
+    marginTop: Platform.OS === 'ios' ? 44 + 80 : StatusBar.currentHeight + 80,
   },
   horizontalScroll2: {
-    width:width,
+    paddingLeft: 10, // Thêm khoảng cách giữa các mục
   },
-  safe:{
-    backgroundColor: 'rgba(0,0, 0, 0.85)', 
+  safe: {
+    backgroundColor: 'rgba(0,0, 0, 0.85)',
     position: 'absolute',
     top: 0,
     zIndex: 16,
     left: 0,
     right: 0,
   },
-  blurView: {
-  },
+  blurView: {},
   topNav: {
-    marginHorizontal:20,
+    marginHorizontal: 20,
     position: 'absolute',
     top: 0,
     left: 0,
@@ -214,13 +204,12 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   navLogo: {
-    height:30,
-    width:30
-    
+    height: 30,
+    width: 30,
   },
   navLogotext: {
-    height:12,
-    width:80
+    height: 12,
+    width: 80,
   },
   navProfile: {
     height: 40,
@@ -231,7 +220,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
   coverImageVertical: {
     width: 100,
     height: 150,
@@ -241,7 +229,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  
   readButton: {
     backgroundColor: '#ff4b25',
     width: 170,
@@ -269,18 +256,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
   },
-  continueRead:{
-    flexDirection:'column',
-    alignItems:'flex-start',
-    justifyContent:'flex-start',
-    width:width-20,
-    marginVertical:20,
-    marginHorizontal:10,
+  continueRead: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    width: width - 20,
+    marginVertical: 20,
+    marginHorizontal: 10,
   },
-  continueReadTitle:{
-    fontSize:16,
-    fontWeight:'500',
-    color:'grey',
-    marginLeft:5
+  continueReadTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'grey',
+    marginLeft: 5,
   },
 });

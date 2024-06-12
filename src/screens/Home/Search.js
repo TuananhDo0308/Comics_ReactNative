@@ -1,38 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, Dimensions, Platform, ImageBackground, StyleSheet, SafeAreaView, TextInput, FlatList, TouchableOpacity, Keyboard } from 'react-native';
+import { View, Text, Dimensions, ImageBackground, StyleSheet, SafeAreaView, TextInput, FlatList, TouchableOpacity, Keyboard } from 'react-native';
 import { useNavigationState } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; // Sử dụng Ionicons cho icon tìm kiếm
+import { Ionicons } from '@expo/vector-icons';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
 import { fetchComicsList, fetchGenresList } from '../../api/api';
-
+import ComicItem from '../../components/searchComic';
 const { width } = Dimensions.get('window');
 
 const Search = () => {
   const currentRoute = useNavigationState(state => state.routes[state.index].name);
   const [searchText, setSearchText] = useState('');
-  const [comicsList, setComicsList] = useState([])
-  const [genres, setGenres] = useState([])
+  const [comicsList, setComicsList] = useState([]);
+  const [genres, setGenres] = useState([]);
   const [filteredComics, setFilteredComics] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState(null);
-  // const [genres, setGenres] = useState([
-  //   { id: '1', name: 'Action' },
-  //   { id: '2', name: 'Romance' },
-  //   { id: '3', name: 'Horror' },
-  //   { id: '4', name: 'Comedy' },
-  //   { id: '5', name: 'Sci-Fi' },
-  //   // Add more genres as needed
-  // ]);
-
-  // const [comicsList, setComicsList] = useState([
-  //   // Dummy data for comics
-  //   { id: '1', title: 'Comic 1', genre: 'Action' },
-  //   { id: '2', title: 'Comic 2', genre: 'Romance' },
-  //   { id: '3', title: 'Comic 3', genre: 'Horror' },
-  //   { id: '4', title: 'Comic 4', genre: 'Comedy' },
-  //   { id: '5', title: 'Comic 5', genre: 'Sci-Fi' },
-  //   // Add more comics as needed
-  // ]);
-
 
   useEffect(() => {
     fetchGenresList().then(data => {
@@ -45,17 +26,16 @@ const Search = () => {
     });
   }, []);
 
-  const passwordInputRef = useRef(null);
-
-
   useEffect(() => {
-    let filteredComics = comicsList
+    let filteredComics = comicsList;
 
-    if (searchText)
+    if (searchText) {
       filteredComics = filteredComics.filter(comic => comic.Title.toLowerCase().includes(searchText.toLowerCase()));
+    }
 
-    if (selectedGenre)
+    if (selectedGenre) {
       filteredComics = filteredComics.filter(comic => comic.Genre === selectedGenre);
+    }
 
     setFilteredComics(filteredComics);
   }, [searchText, comicsList, selectedGenre]);
@@ -85,7 +65,7 @@ const Search = () => {
               placeholderTextColor="#888"
               value={searchText}
               onChangeText={setSearchText}
-              onSubmitEditing={handleSearch} // Thực hiện tìm kiếm khi nhấn Enter
+              onSubmitEditing={handleSearch}
             />
           </View>
           <View style={styles.genreListContainer}>
@@ -97,7 +77,6 @@ const Search = () => {
                   { backgroundColor: item.Genre === selectedGenre ? 'rgba(100, 100, 100, 0.7)' : 'rgba(50, 50, 50, 0.7)' }
                   ]}
                   onPress={() => handleGenreSelect(item.Genre)}>
-
                   <Text style={styles.genreText}>{item.Genre}</Text>
                 </TouchableOpacity>
               )}
@@ -110,14 +89,10 @@ const Search = () => {
           <View style={styles.content}>
             <FlatList
               data={filteredComics}
-              renderItem={({ item }) => (
-                <View style={styles.comicItem}>
-                  <Text style={styles.comicTitle}>{item.Title}</Text>
-                  <Text style={styles.comicGenre}>{item.Genre}</Text>
-                </View>
-              )}
+              renderItem={({ item }) => <ComicItem item={item} />}
               keyExtractor={item => item.id}
               showsVerticalScrollIndicator={false}
+              contentContainerStyle={[{paddingBottom:20}]}
             />
           </View>
           <HomeBottomNavigation currentRoute={currentRoute} />        
@@ -137,7 +112,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.0)', // Semi-transparent background for blur effect
+    backgroundColor: 'rgba(0, 0, 0, 0.0)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -153,9 +128,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(50, 50, 50, 0.5)',
     borderRadius: 25,
     paddingHorizontal: 15,
-    paddingVertical:10,
-    marginHorizontal:20,
-    marginVertical:10,
+    paddingVertical: 10,
+    marginHorizontal: 20,
+    marginVertical: 10,
   },
   searchInput: {
     flex: 1,
@@ -183,20 +158,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  comicItem: {
-    backgroundColor: 'rgba(50, 50, 50, 0.7)',
-    borderRadius: 10,
-    padding: 20,
-    marginVertical: 10,
-    width: width - 40,
-  },
-  comicTitle: {
-    color: 'white',
-    fontSize: 18,
-  },
-  comicGenre: {
-    color: 'grey',
-    fontSize: 14,
+  comicList: {
+    paddingHorizontal: 10,
   },
   contentText: {
     color: 'white',
