@@ -26,17 +26,22 @@ const Home = () => {
         setCurrentComicId(comics[0].id);
       }
     });
+
+
+    fetchGenresList().then(genres => {
+      setGenresList(genres);
+    });
   }, []);
 
   const handlePress = (comicId) => {
     navigation.navigate('Chapters', { comicId });
   };
 
-  useEffect(() => {
-    fetchGenresList().then(genres => {
-      setGenresList(genres);
-    });
-  }, []);
+  // useEffect(() => {
+  //   fetchGenresList().then(genres => {
+  //     setGenresList(genres);
+  //   });
+  // }, []);
 
   const topNavTranslateY = scrollY.interpolate({
     inputRange: [0, 150],

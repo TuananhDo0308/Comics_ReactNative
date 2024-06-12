@@ -10,6 +10,10 @@ const { width } = Dimensions.get('window');
 const Search = () => {
   const currentRoute = useNavigationState(state => state.routes[state.index].name);
   const [searchText, setSearchText] = useState('');
+  const [comicsList, setComicsList] = useState([])
+  const [genres, setGenres] = useState([])
+  const [filteredComics, setFilteredComics] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState(null);
   // const [genres, setGenres] = useState([
   //   { id: '1', name: 'Action' },
   //   { id: '2', name: 'Romance' },
@@ -18,13 +22,6 @@ const Search = () => {
   //   { id: '5', name: 'Sci-Fi' },
   //   // Add more genres as needed
   // ]);
-
-  const [genres, setGenres] = useState([])
-  useEffect(() => {
-    fetchGenresList().then(data => {
-      setGenres(data);
-    });
-  }, []);
 
   // const [comicsList, setComicsList] = useState([
   //   // Dummy data for comics
@@ -37,25 +34,40 @@ const Search = () => {
   // ]);
 
 
-  const [comicsList, setComicsList] = useState([])
-
   useEffect(() => {
+    fetchGenresList().then(data => {
+      setGenres(data);
+    });
+
     fetchComicsList().then(data => {
       setComicsList(data);
       setFilteredComics(data);
     });
   }, []);
 
-
   const passwordInputRef = useRef(null);
+
+
+  useEffect(() => {
+    let filteredComics = comicsList
+
+    if (searchText)
+      filteredComics = filteredComics.filter(comic => comic.Title.toLowerCase().includes(searchText.toLowerCase()));
+
+    if (selectedGenre)
+      filteredComics = filteredComics.filter(comic => comic.Genre === selectedGenre);
+
+    setFilteredComics(filteredComics);
+  }, [searchText, comicsList, selectedGenre]);
 
   const handleSearch = () => {
     Keyboard.dismiss();
     // Thực hiện hành động tìm kiếm dựa trên searchText
     console.log('Searching for:', searchText);
-    // Cập nhật comicsList dựa trên kết quả tìm kiếm (ví dụ dưới đây chỉ là giả lập)
-    const filteredComics = comicsList.filter(comic => comic.title.toLowerCase().includes(searchText.toLowerCase()));
-    setComicsList(filteredComics);
+  };
+
+  const handleGenreSelect = genre => {
+    setSelectedGenre(genre === selectedGenre ? null : genre); // Toggle selection
   };
 
   return (
@@ -80,7 +92,12 @@ const Search = () => {
             <FlatList
               data={genres}
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.genreItem}>
+                <TouchableOpacity 
+                  style={[styles.genreItem, 
+                  { backgroundColor: item.Genre === selectedGenre ? 'rgba(100, 100, 100, 0.7)' : 'rgba(50, 50, 50, 0.7)' }
+                  ]}
+                  onPress={() => handleGenreSelect(item.Genre)}>
+
                   <Text style={styles.genreText}>{item.Genre}</Text>
                 </TouchableOpacity>
               )}
@@ -92,7 +109,7 @@ const Search = () => {
           </View>
           <View style={styles.content}>
             <FlatList
-              data={comicsList}
+              data={filteredComics}
               renderItem={({ item }) => (
                 <View style={styles.comicItem}>
                   <Text style={styles.comicTitle}>{item.Title}</Text>
