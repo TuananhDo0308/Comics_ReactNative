@@ -106,7 +106,7 @@ import { db } from '../../firebaseConfig';
 const fetchComicsList = async () => {
   try {
     const comicsList = [];
-    const querySnapshot = await db.collection('comics').get();
+    const querySnapshot = await db.collection('comics').orderBy('Title').get();
     // querySnapshot.forEach(doc => {
     //   comicsList.push({ id: doc.id, ...doc.data() });
     // });
@@ -133,7 +133,7 @@ const fetchComicsList = async () => {
 const fetchGenresList = async () => {
   try {
     const genresList = [];
-    const querySnapshot = await db.collection('genres').get();
+    const querySnapshot = await db.collection('genres').orderBy('Genre').get();
     for (const genreDoc of querySnapshot.docs) {
       const genreData = genreDoc.data();
       const comicsSnapshot = await db.collection('comics').where('Genre', '==', genreDoc.ref).get();

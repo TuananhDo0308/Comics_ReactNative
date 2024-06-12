@@ -1,31 +1,51 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { View, Text, Dimensions, Platform, ImageBackground, StyleSheet, SafeAreaView, TextInput, FlatList, TouchableOpacity, Keyboard } from 'react-native';
 import { useNavigationState } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; // Sử dụng Ionicons cho icon tìm kiếm
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
+import { fetchComicsList, fetchGenresList } from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
 const Search = () => {
   const currentRoute = useNavigationState(state => state.routes[state.index].name);
   const [searchText, setSearchText] = useState('');
-  const [genres, setGenres] = useState([
-    { id: '1', name: 'Action' },
-    { id: '2', name: 'Romance' },
-    { id: '3', name: 'Horror' },
-    { id: '4', name: 'Comedy' },
-    { id: '5', name: 'Sci-Fi' },
-    // Add more genres as needed
-  ]);
-  const [comicsList, setComicsList] = useState([
-    // Dummy data for comics
-    { id: '1', title: 'Comic 1', genre: 'Action' },
-    { id: '2', title: 'Comic 2', genre: 'Romance' },
-    { id: '3', title: 'Comic 3', genre: 'Horror' },
-    { id: '4', title: 'Comic 4', genre: 'Comedy' },
-    { id: '5', title: 'Comic 5', genre: 'Sci-Fi' },
-    // Add more comics as needed
-  ]);
+  // const [genres, setGenres] = useState([
+  //   { id: '1', name: 'Action' },
+  //   { id: '2', name: 'Romance' },
+  //   { id: '3', name: 'Horror' },
+  //   { id: '4', name: 'Comedy' },
+  //   { id: '5', name: 'Sci-Fi' },
+  //   // Add more genres as needed
+  // ]);
+
+  const [genres, setGenres] = useState([])
+  useEffect(() => {
+    fetchGenresList().then(data => {
+      setGenres(data);
+    });
+  }, []);
+
+  // const [comicsList, setComicsList] = useState([
+  //   // Dummy data for comics
+  //   { id: '1', title: 'Comic 1', genre: 'Action' },
+  //   { id: '2', title: 'Comic 2', genre: 'Romance' },
+  //   { id: '3', title: 'Comic 3', genre: 'Horror' },
+  //   { id: '4', title: 'Comic 4', genre: 'Comedy' },
+  //   { id: '5', title: 'Comic 5', genre: 'Sci-Fi' },
+  //   // Add more comics as needed
+  // ]);
+
+
+  const [comicsList, setComicsList] = useState([])
+
+  useEffect(() => {
+    fetchComicsList().then(data => {
+      setComicsList(data);
+      setFilteredComics(data);
+    });
+  }, []);
+
 
   const passwordInputRef = useRef(null);
 
@@ -61,7 +81,7 @@ const Search = () => {
               data={genres}
               renderItem={({ item }) => (
                 <TouchableOpacity style={styles.genreItem}>
-                  <Text style={styles.genreText}>{item.name}</Text>
+                  <Text style={styles.genreText}>{item.Genre}</Text>
                 </TouchableOpacity>
               )}
               keyExtractor={item => item.id}
@@ -75,8 +95,8 @@ const Search = () => {
               data={comicsList}
               renderItem={({ item }) => (
                 <View style={styles.comicItem}>
-                  <Text style={styles.comicTitle}>{item.title}</Text>
-                  <Text style={styles.comicGenre}>{item.genre}</Text>
+                  <Text style={styles.comicTitle}>{item.Title}</Text>
+                  <Text style={styles.comicGenre}>{item.Genre}</Text>
                 </View>
               )}
               keyExtractor={item => item.id}
