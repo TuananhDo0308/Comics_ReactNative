@@ -3,7 +3,7 @@ import { View, Text, Image, Animated, StyleSheet, StatusBar, ImageBackground, Fl
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
-import { fetchComicsList } from '../../api/api';
+import { fetchComicsList, fetchGenresList, fetchChapters } from '../../api/api';
 import ComicItem from '../../components/HighlightComic';
 import ComicGerne from '../../components/ComicGerne';
 import { BlurView } from 'expo-blur'
@@ -13,6 +13,7 @@ const { width, height } = Dimensions.get('window');
 const Home = () => {
   const [comicsList, setComicsList] = useState([]);
   const [currentComicId, setCurrentComicId] = useState(null);
+  const [genresList, setGenresList] = useState([]);
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
   
@@ -30,6 +31,12 @@ const Home = () => {
   const handlePress = (comicId) => {
     navigation.navigate('Chapters', { comicId });
   };
+
+  useEffect(() => {
+    fetchGenresList().then(genres => {
+      setGenresList(genres);
+    });
+  }, []);
 
   const topNavTranslateY = scrollY.interpolate({
     inputRange: [0, 150],
@@ -88,7 +95,7 @@ const Home = () => {
           <View style={styles.hotTrend}>
             <FlatList
               data={comicsList}
-              renderItem={({ item }) => item ? <ComicItem item={item} /> : null}
+              renderItem={({ item }) => item ? <ComicItem item={item}/> : null}
               horizontal
               snapToAlignment="center"
               showsHorizontalScrollIndicator={false}
@@ -110,24 +117,30 @@ const Home = () => {
             </Text>
             <MyCarousel data={comicsList} />
           </View>
-          <View style={styles.continueRead}>
-            <Text style={styles.continueReadTitle}>
-              CONTINUE READING
-            </Text>
-            <FlatList
-                data={comicsList}
-                renderItem={({ item }) => item ? <ComicGerne item={item} /> : null}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                decelerationRate="fast"
-                keyExtractor={item => item.id}
-                contentContainerStyle={styles.horizontalScroll2}
-                pagingEnabled
-              />
-          </View>
-          
-          
-          
+
+          {/* List Genre */}
+          <FlatList
+            data={genresList}
+            renderItem={({ item }) => (
+              <View style={styles.continueRead}>
+                <Text style={styles.continueReadTitle}>
+                  {item.Genre}
+                </Text>
+                <FlatList
+                  data={item.comics}
+                  renderItem={({ item }) => item ? <ComicGerne item={item}/> : null}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  decelerationRate="fast"
+                  keyExtractor={item => item.id}
+                  contentContainerStyle={styles.horizontalScroll2}
+                  pagingEnabled
+                />
+              </View>
+            )}
+            keyExtractor={item => item.id}
+          />
+
         </Animated.ScrollView>
         <Animated.View style={[styles.bottomNav, { transform: [{ translateY: bottomNavTranslateY }] }]}>
           <HomeBottomNavigation currentRoute="Home" />

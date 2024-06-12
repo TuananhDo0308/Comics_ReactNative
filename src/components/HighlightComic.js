@@ -15,7 +15,7 @@ const ComicItem = ({ item }) => {
           style={styles.coverImage}
         />
         <BlurView intensity={30} style={[styles.tagContainer]}>
-          <Text style={styles.tag}>Tag</Text>
+          <Text style={styles.tag}>{item.Genre}</Text>
         </BlurView>
       </View>
       <View style={styles.comicInfo}>

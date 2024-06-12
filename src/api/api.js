@@ -107,9 +107,21 @@ const fetchComicsList = async () => {
   try {
     const comicsList = [];
     const querySnapshot = await db.collection('comics').get();
-    querySnapshot.forEach(doc => {
-      comicsList.push({ id: doc.id, ...doc.data() });
-    });
+    // querySnapshot.forEach(doc => {
+    //   comicsList.push({ id: doc.id, ...doc.data() });
+    // });
+
+    for (const doc of querySnapshot.docs) {
+      const comicData = doc.data();
+      const genreRef = comicData.Genre;
+
+      // Lấy dữ liệu từ tài liệu genre reference
+      const genreDoc = await genreRef.get();
+      const genreData = genreDoc.exists ? genreDoc.data() : { Genre: 'Unknown' };
+
+      comicsList.push({ id: doc.id, ...comicData, Genre: genreData.Genre });
+    }
+
     return comicsList;
   } catch (error) {
     console.error('Error fetching comics from Firestore:', error);
@@ -117,4 +129,41 @@ const fetchComicsList = async () => {
   }
 };
 
-export { fetchComicsList };
+
+const fetchGenresList = async () => {
+  try {
+    const genresList = [];
+    const querySnapshot = await db.collection('genres').get();
+    for (const genreDoc of querySnapshot.docs) {
+      const genreData = genreDoc.data();
+      const comicsSnapshot = await db.collection('comics').where('Genre', '==', genreDoc.ref).get();
+      
+      const comicsList = comicsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      genresList.push({ id: genreDoc.id, Genre: genreData.Genre, comics: comicsList });
+    }
+
+    return genresList;
+  } catch (error) {
+    console.error('Error fetching genres from Firestore:', error);
+    return [];
+  }
+};
+
+
+const fetchChapters = async (comicId) => {
+  try {
+    const chaptersList = [];
+    const querySnapshot = await db.collection('comics').doc(comicId).collection('Chapters').get();
+    querySnapshot.forEach(doc => {
+      if (doc.exists) {
+        chaptersList.push({ id: doc.id, ...doc.data() });
+      }
+    });
+    return chaptersList;
+  } catch (error) {
+    console.error('Error fetching chapters from Firestore:', error);
+    return [];
+  }
+};
+
+export { fetchComicsList, fetchGenresList, fetchChapters };
