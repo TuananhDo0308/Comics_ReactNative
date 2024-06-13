@@ -25,7 +25,7 @@ const Chapters = () => {
   }, [comicId]);
 
   const handlePress = (chapterId) => {
-    navigation.navigate('ChapterPages', { chapterId });
+    navigation.navigate('ChapterPages', { comicId, chapterId });
   };
 
   const onGestureEvent = (event) => {
