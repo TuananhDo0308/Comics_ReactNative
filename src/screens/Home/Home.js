@@ -77,7 +77,7 @@ const Home = () => {
           <Image style={styles.navLogo} source={require('../../assets/imglogo.png')} />
           <Image style={styles.navLogotext} source={require('../../assets/applogo.png')} />
           <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-            <Image style={styles.navProfile} source={require('../../assets/img1.jpg')} />
+            <Image style={styles.navProfile} source={require('../../assets/img1.png')} />
           </TouchableOpacity>
         </Animated.View>
         <Animated.ScrollView

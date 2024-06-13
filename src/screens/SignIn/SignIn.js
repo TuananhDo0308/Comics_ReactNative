@@ -1,72 +1,88 @@
 import React from 'react';
-import { View, SafeAreaView, Image, StyleSheet, Platform, FlatList, Text, Dimensions, TouchableOpacity, StatusBar } from 'react-native';
+import { View, SafeAreaView, Image, StyleSheet, Platform, FlatList, Text, Dimensions, TouchableOpacity, StatusBar, ImageBackground } from 'react-native';
 
 const images = [
-  { id: '1', src: require('../../assets/img1.jpg') },
-  { id: '2', src: require('../../assets/img2.jpg') },
-  { id: '3', src: require('../../assets/img3.jpg') },
+  { id: '1', src: require('../../assets/img1.png') },
+  { id: '2', src: require('../../assets/img2.png') },
+  { id: '3', src: require('../../assets/img3.png') },
 ];
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const SignIn = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar />
-      <View style={styles.topNav}>
-        <Image source={require('../../assets/icon/appIcon.png')} style={styles.Img} />
-        <View style={styles.topNavSup}>
-          <TouchableOpacity style={styles.topNavSup_Button}>
-            <Text style={styles.topNavSup_Text}>Privacy</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.topNavSup_Button}>
-            <Text style={styles.topNavSup_Text}>Help</Text>
-          </TouchableOpacity>
-        </View>
+    <ImageBackground 
+      source={require('../../assets/background.jpg')} 
+      style={styles.background}
+    >
+      <View style={styles.overlay}>
+        <SafeAreaView style={styles.container}>
+          <StatusBar />
+          <View style={styles.topNav}>
+            <Image source={require('../../assets/imglogo.png')} style={styles.Img} />
+            <View style={styles.topNavSup}>
+              <TouchableOpacity style={styles.topNavSup_Button}>
+                <Text style={styles.topNavSup_Text}>Privacy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.topNavSup_Button}>
+                <Text style={styles.topNavSup_Text}>Help</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.body}>
+            <FlatList
+              style={styles.listImg}
+              data={images}
+              horizontal
+              keyExtractor={item => item.id}
+              renderItem={({ item }) => (
+                <Image source={item.src} style={styles.image} />
+              )}
+              snapToInterval={width}
+              decelerationRate="fast"
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.flatListContent}
+            />
+          </View>
+          <View style={styles.botNav}>
+            <TouchableOpacity style={styles.botNav_Button} onPress={() => navigation.navigate('SignInForm')}>
+              <Text style={styles.botNav_Button_Text}>Get Started</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
       </View>
-      <View style={styles.body}>
-        <FlatList
-          style={styles.listImg}
-          data={images}
-          horizontal
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <Image source={item.src} style={styles.image} />
-          )}
-          snapToInterval={width}
-          decelerationRate="fast"
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.flatListContent}
-        />
-      </View>
-      <View style={styles.botNav}>
-        <TouchableOpacity style={styles.botNav_Button} onPress={() => navigation.navigate('SignInForm')}>
-          <Text style={styles.botNav_Button_Text}>Get Started</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    </ImageBackground>
   );
 };
 
 export default SignIn;
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent background for blur effect
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#1d1d1d',
     justifyContent: 'space-between',
   },
   topNav: {
     height: 50,
+    marginHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   topNavSup: {
     flexDirection: 'row',
-    marginLeft: 10,
-    marginRight: 10,
   },
   topNavSup_Button: {
     marginHorizontal: 5,
@@ -75,14 +91,15 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   body: {
-    flex: 1,
     justifyContent: 'center',
+    height: height - 300,
     alignItems: 'center',
   },
   botNav: {
-    width: '100%',
+    width: width,
     marginBottom: 10,
     justifyContent: 'center',
+
     alignItems: 'center',
   },
   botNav_Button: {
@@ -111,12 +128,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   Img: {
-    width: 100,
-    height: 40,
+    width: 30,
+    height: 30,
   },
   image: {
     width: width,
-    height: width,
+    height: height,
   },
   flatListContent: {
     justifyContent: 'center',

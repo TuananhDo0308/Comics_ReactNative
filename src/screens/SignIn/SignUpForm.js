@@ -1,10 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput,Dimensions,Platform, TouchableOpacity, Image, StyleSheet, SafeAreaView, Alert} from 'react-native';
+import { View, Text, TextInput, Dimensions, Platform, TouchableOpacity, Image, StyleSheet, SafeAreaView, Alert, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firebase, db } from '../../../firebaseConfig';
 
 const { width } = Dimensions.get('window');
-
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -49,164 +48,138 @@ const SignUpForm = () => {
         Alert.alert('Error', error.message);
       });
   }
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.header_title}>Create an</Text>
-        <Text style={styles.header_title}>account!</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Email or phone number"
-          placeholderTextColor="#aaa"
-          keyboardType="email-address" 
-          value={email}
-          onChangeText={setEmail}
-        />
-        <View style={styles.passwordContainer}>
-          <TextInput
-            style={[styles.input, { flex: 1 },{backgroundColor:'none'}]}
-            placeholder="Password"
-            placeholderTextColor="#aaa"
-            secureTextEntry={!showPassword}
-            ref={passwordInputRef}  
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TouchableOpacity 
-            onPress={() => setShowPassword(!showPassword)} 
-            style={styles.showButton}
-          >
-            <Text style={styles.showButtonText}>{showPassword ? 'HIDE' : 'SHOW'}</Text>
-          </TouchableOpacity>
-          
-        </View>
-        <View style={[styles.passwordContainer,{marginTop:0}]}>
-          <TextInput
-            style={[styles.input, { flex: 1 },{backgroundColor:'none'}]}
-            placeholder="Confirm password"
-            placeholderTextColor="#aaa"
-            secureTextEntry={true}
-            ref={passwordInputRef}  
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
-        </View>
-          <Text style={styles.forgotPasswordText}>By clicking the Register button, you agree to the public offer</Text>
-        
-      </View>
-      
-      <View style={styles.signInContainer}>
-          <Text style={styles.sigIn_title}> Register</Text>
-          <TouchableOpacity style={styles.signInButton} onPress={signUp}>
-            <Image style={styles.signInButtonIcon} source={require('../../assets/icon/nextIcon.png')} />
-          </TouchableOpacity>
-      </View>
 
-      <View style={styles.otherSignIn}>
-      
-        <Text style={styles.footerText}>Sign up with</Text>
-        <View style={styles.listLoginMethod}>
-        <TouchableOpacity style={styles.otherSignInButton}>
-          <Image style={styles.otherSignInButtonIcon} source={require('../../assets/icon/googleIcon.png')} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.otherSignInButton}>
-          <Image style={[styles.otherSignInButtonIcon,{height:35}]} source={require('../../assets/icon/appleIcon.png')} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.otherSignInButton}>
-          <Image style={[styles.otherSignInButtonIcon, {tintColor:'white'}]} source={require('../../assets/icon/facebookIcon.png')} />
-        </TouchableOpacity>
-        </View>
+  return (
+    <ImageBackground 
+      source={require('../../assets/background.jpg')} 
+      style={styles.background}
+    >
+      <View style={styles.overlay}>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.header_title}>Create an</Text>
+            <Text style={styles.header_title}>account!</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Email or phone number"
+                placeholderTextColor="#aaa"
+                keyboardType="email-address" 
+                value={email}
+                onChangeText={setEmail}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                placeholder="Password"
+                placeholderTextColor="#aaa"
+                secureTextEntry={!showPassword}
+                ref={passwordInputRef}
+                value={password}
+                onChangeText={setPassword}
+              />
+              <TouchableOpacity 
+                onPress={() => setShowPassword(!showPassword)} 
+                style={styles.showButton}
+              >
+                <Text style={styles.showButtonText}>{showPassword ? 'HIDE' : 'SHOW'}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                placeholder="Confirm password"
+                placeholderTextColor="#aaa"
+                secureTextEntry={true}
+                ref={passwordInputRef}  
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+            </View>
+            <Text style={styles.forgotPasswordText}>By clicking the Register button, you agree to the public offer</Text>
+          </View>
+          <TouchableOpacity style={styles.signInButton} onPress={signUp}>
+              <Image style={styles.signInButtonIcon} source={require('../../assets/icon/nextIcon.png')} />
+            </TouchableOpacity>
+         
+          <View style={styles.footer}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={styles.footerText}>
+                Back
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
       </View>
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.footerText}>
-            Back
-          </Text>
-        </TouchableOpacity>
-      </View>
-      
-    </SafeAreaView>
+    </ImageBackground>
   );
 };
 
 export default SignUpForm;
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent background for blur effect
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#1d1d1d',
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 20,
   },
   header: {
-    flex:5,
     flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 20,
-    padding:30
+    padding: 30,
   },
-  header_title:{
-    fontSize:40,
-    color:'white',
-    fontWeight:'800',
-
+  header_title: {
+    fontSize: 40,
+    color: 'white',
+    fontWeight: '800',
   },
-  signInContainer:{
-    flex:1,
-    margin:20,
-    flexDirection:'row',
-    justifyContent:'space-between',
-  },
-  otherSignIn: {
-    flex: 4,
-    justifyContent: 'center',
-    alignItems:'center',
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(51, 51, 51, 0.5)', // Semi-transparent background for input
+    borderRadius: 5,
+    marginTop: 10,
+    width: width - 60,
   },
   input: {
-    marginTop:20,
-    width: width-60,
-    backgroundColor: '#333',
     fontSize: 16,
     color: '#fff',
     height: 50,
-    borderRadius: 5,
     paddingHorizontal: 15,
-    alignItems:'center',
-    justifyContent:'center',
-    marginBottom: 15,
-  },
-  passwordContainer: {
-    height:50,
-    marginBottom: 15,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#333',
-    borderRadius: 5,
   },
   showButton: {
-    right: 10,
-    height:50,
-    justifyContent:'center',
-    alignItems:'center',
+    marginRight: 10,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   showButtonText: {
     color: '#aaa',
     fontSize: 15,
   },
-  sigIn_title:{
-    fontSize:30,
-    fontWeight:'700',
-    color:'white'
-  },
-
   signInButton: {
     backgroundColor: '#ff4b25', 
     height: 50,
-    width:50,
+    width: 50,
     borderRadius: 100,
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'flex-end',
+    marginRight: 30,
     marginBottom: 15,
     ...Platform.select({
       ios: {
@@ -221,55 +194,34 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  signInButtonIcon:{
-    height:30,
-    width:30,
-    tintColor:'white',
+  signInButtonIcon: {
+    height: 30,
+    width: 30,
+    tintColor: 'white',
   },
- 
   forgotPasswordText: {
     color: '#aaa',
-    marginLeft:10,
-    width:width-100,
-    alignItems:'flex-start'
+    marginLeft: 10,
+    width: width - 100,
+    alignItems: 'flex-start'
   },
-
-  listLoginMethod:{
-    flexDirection:'row',
-    padding:10,
-    gap:20
-  },
-
-  otherSignInButton:{
-    height:50,
-    width: 50,
-    backgroundColor:'#333',
-    alignItems:'center',
-    justifyContent:'center',
-    borderRadius:100,
-  },
-
-  otherSignInButtonIcon:{
-    height:30,
-    width: 30,
-  },
-
   footer: {
     paddingVertical: 10,
   },
   footerText: {
     color: '#aaa',
     fontSize: 16,
-    textAlign:'center',
+    textAlign: 'center',
   },
-  learnMoreText: {
-    textDecorationLine: 'underline',
+  sigIn_title: {
+    fontSize: 30,
+    fontWeight: '700',
+    color: 'white'
   },
-
-  signUpContainer:{
-    flex:1,
-    flexDirection:'row',
-    gap:10,
-    justifyContent:'center'
-    },
+  signInContainer: {
+    flex: 1,
+    margin: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
 });
