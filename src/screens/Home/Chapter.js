@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, Dimensions, ImageBackground } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { fetchChapters, fetchComicDetails } from '../../api/api';  // Bạn cần tạo hàm fetchComicDetails trong file API
+import { BlurView } from 'expo-blur';
+import Constants from 'expo-constants';
 
 const { width, height } = Dimensions.get('window');
 
@@ -11,6 +15,9 @@ const Chapters = () => {
   const [chapters, setChapters] = useState([]);
   const [comicDetails, setComicDetails] = useState({});
   const navigation = useNavigation();
+  
+  const translateY = useSharedValue(0);
+  const [showFull, setShowFull] = useState(false);
 
   useEffect(() => {
     fetchChapters(comicId).then(setChapters);
@@ -21,74 +28,107 @@ const Chapters = () => {
     navigation.navigate('ChapterPages', { chapterId });
   };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.chapterItem} onPress={() => handlePress(item.id)}>
+  const onGestureEvent = (event) => {
+    translateY.value = event.translationY;
+  };
+
+  const onHandlerStateChange = (event) => {
+    if (event.nativeEvent.state === State.END) {
+      if (event.nativeEvent.translationY < -50) {
+        setShowFull(true);
+      } else {
+        translateY.value = withSpring(0);
+      }
+    }
+  };
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: showFull ? -height / 2 : translateY.value }],
+    };
+  });
+
+  const renderItem = (item) => (
+    <TouchableOpacity style={styles.chapterItem} onPress={() => handlePress(item.id)} key={item.id}>
       <Text style={styles.chapterTitle}>{item.Title}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <ImageBackground 
-      source={{ uri: comicDetails.coverImage }}  // Nền hình ảnh của truyện
-      style={styles.background}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.header}>
-          <Image source={{ uri: comicDetails.ImgURL }} style={styles.comicImage} />
-          <View style={styles.comicInfo}>
-            <Text style={styles.comicTitle}>{comicDetails.Title}</Text>
-            <Text style={styles.comicAuthor}>by {comicDetails.Author}</Text>
-          </View>
+    <View style={styles.container}>
+      <ImageBackground source={{ uri: comicDetails.ImgURL }} style={styles.comicImage} resizeMode="cover">
+        <BlurView intensity={50} style={styles.blurView} />
+        <View style={styles.topNav}>
+          <TouchableOpacity style={styles.button}>
+            <Image style={styles.buttonImg} source={require('../../assets/icon/backIcon.png')}></Image>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Image style={styles.buttonImg} source={require('../../assets/icon/backIcon.png')}></Image>
+          </TouchableOpacity>
         </View>
-        <FlatList
-          data={chapters}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.scrollContent}
-        />
-      </View>
-    </ImageBackground>
+        <Animated.View style={[styles.detailsContainer, animatedStyle]}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={styles.details}>
+              <Image source={{uri:comicDetails.ImgURL}} style={styles.detailImage}></Image>
+              <Text style={styles.comicTitle}>{comicDetails.Title}</Text>
+              <Text style={styles.comicAuthor}>Series: {comicDetails.Author}</Text>
+              <Text style={styles.comicInfo}>Genre</Text>
+            </View>
+            {chapters.map(renderItem)}
+          </ScrollView>
+        </Animated.View>
+      </ImageBackground>
+    </View>
   );
 };
 
 export default Chapters;
 
 const styles = StyleSheet.create({
-  background: {
+  container: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(20, 20, 20, 0.9)', // Semi-transparent background
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    padding: 10,
-    alignItems: 'center',
+    backgroundColor: '#000',
   },
   comicImage: {
-    width: 100,
-    height: 150,
-    borderRadius: 10,
+    width: width,
+    height: height,
   },
-  comicInfo: {
-    marginLeft: 10,
+  blurView: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  detailsContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(20, 20, 20, 0.8)',
+    borderTopStartRadius:30,
+    borderTopEndRadius:30,
+    paddingTop:20,
+  },
+  details: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  detailImage: {
+    height: 150,
+    width: 100,
+    borderRadius: 20,
   },
   comicTitle: {
-    color: 'white',
     fontSize: 24,
+    color: 'white',
     fontWeight: 'bold',
+    marginBottom: 10,
   },
   comicAuthor: {
-    color: 'grey',
     fontSize: 16,
+    color: 'grey',
+  },
+  comicInfo: {
+    fontSize: 14,
+    color: 'grey',
+    marginVertical: 10,
   },
   scrollContent: {
-    padding: 10,
+    paddingBottom: 20,
   },
   chapterItem: {
     padding: 10,
@@ -98,5 +138,21 @@ const styles = StyleSheet.create({
   chapterTitle: {
     fontSize: 18,
     color: 'white',
+  },
+  topNav: {
+    paddingTop: Constants.statusBarHeight ,
+    paddingBottom:20,
+    flexDirection: 'row',
+    width: width,
+    justifyContent: 'space-between',
+  },
+  button: {
+    height: 25,
+    marginHorizontal:20,
+    width: 25,
+  },
+  buttonImg: {
+    height: 25,
+    width: 25,
   },
 });
