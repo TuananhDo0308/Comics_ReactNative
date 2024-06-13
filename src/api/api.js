@@ -1,4 +1,6 @@
 import { db, storage } from '../../firebaseConfig';
+import { auth } from '../../firebaseConfig';
+import firebase from 'firebase/compat/app';
 
 // Lấy danh sách truyện tranh
 const fetchComicsList = async () => {
@@ -65,25 +67,6 @@ const fetchChapters = async (comicId) => {
   }
 };
 
-const fetchChapterPages = async (comicId, chapterId) => {
-  try {
-    const chapterDoc = await db.collection('comics').doc(comicId).collection('Chapters').doc(chapterId).get();
-    if (chapterDoc.exists) {
-      const contents = chapterDoc.data().Content; // Mảng URL dạng `gs://`
-      const urls = await Promise.all(contents.map(async (content) => {
-        const storageRef = storage.refFromURL(content); // Tạo tham chiếu từ URL
-        return await storageRef.getDownloadURL(); // Lấy URL tải xuống
-      }));
-      return urls; // Trả về mảng URL tải xuống
-    } else {
-      return [];
-    }
-  } catch (error) {
-    console.error('Error fetching chapter pages from Firestore:', error);
-    return [];
-  }
-};
-
 const fetchChapterPdfUrls = async (comicId, chapterId) => {
   try {
     const chapterDoc = await db.collection('comics').doc(comicId).collection('Chapters').doc(chapterId).get();
@@ -104,4 +87,46 @@ const fetchChapterPdfUrls = async (comicId, chapterId) => {
   }
 };
 
-export { fetchComicsList, fetchGenresList, fetchChapters, fetchChapterPages, fetchChapterPdfUrls };
+// Hàm để toggle favorite comic
+const toggleFavoriteComic = async (comicId) => {
+  const user = auth.currentUser;
+  if (user) {
+    const userRef = db.collection('users').doc(user.uid);
+    const userDoc = await userRef.get();
+    const userData = userDoc.data();
+
+    if (userData.favorites && userData.favorites.includes(comicId)) {
+      // Nếu truyện đã có trong danh sách yêu thích, xóa nó đi
+      await userRef.update({
+        favorites: firebase.firestore.FieldValue.arrayRemove(comicId)
+      });
+    } else {
+      // Nếu truyện chưa có trong danh sách yêu thích, thêm nó vào
+      await userRef.update({
+        favorites: firebase.firestore.FieldValue.arrayUnion(comicId)
+      });
+    }
+  }
+};
+
+// Hàm để lấy danh sách truyện yêu thích
+const fetchFavoriteComics = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    const userData = userDoc.data();
+    const favoriteComics = [];
+
+    if (userData.favorites && userData.favorites.length > 0) {
+      const comicsSnapshot = await db.collection('comics').where(firebase.firestore.FieldPath.documentId(), 'in', userData.favorites).get();
+      comicsSnapshot.forEach(doc => {
+        favoriteComics.push({ id: doc.id, ...doc.data() });
+      });
+    }
+
+    return favoriteComics;
+  }
+  return [];
+};
+
+export { fetchComicsList, fetchGenresList, fetchChapters, fetchFavoriteComics, toggleFavoriteComic, fetchChapterPdfUrls };

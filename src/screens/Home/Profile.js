@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, Dimensions, Image, ImageBackground, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigationState, useNavigation } from '@react-navigation/native';
-import { fetchComicsList } from '../../api/api';
+import { fetchComicsList, fetchFavoriteComics } from '../../api/api';
 import ComicGerne from '../../components/ComicGerne';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
 import Modal from 'react-native-modal';
@@ -13,6 +13,7 @@ const { width } = Dimensions.get('window');
 const Profile = () => {
   const currentRoute = useNavigationState(state => state.routes[state.index].name);
   const [comicsList, setComicsList] = useState([]);
+  const [favoriteComics, setFavoriteComics] = useState([]);
   const [currentComicId, setCurrentComicId] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [translateY, setTranslateY] = useState(0);
@@ -25,6 +26,10 @@ const Profile = () => {
         setCurrentComicId(comics[0].id);
       }
     });
+  }, []);
+
+  useEffect(() => {
+    fetchFavoriteComics().then(setFavoriteComics);
   }, []);
 
 
@@ -86,7 +91,7 @@ const Profile = () => {
             <View style={styles.continueRead}>
               <Text style={styles.continueReadTitle}>FAVOURITE</Text>
               <FlatList
-                  data={comicsList}
+                  data={favoriteComics}
                   renderItem={({ item }) => item ? <ComicGerne item={item} /> : null}
                   horizontal
                   showsHorizontalScrollIndicator={false}

@@ -4,6 +4,8 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { fetchChapters, fetchComicsList } from '../../api/api';  // Bạn cần tạo hàm fetchComicDetails trong file API
 import { BlurView } from 'expo-blur';
 import Constants from 'expo-constants';
+import { auth, db } from '../../../firebaseConfig'
+import { toggleFavoriteComic } from '../../api/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,7 +24,25 @@ const Chapters = () => {
       const comic = comics.find(c => c.id === comicId);
       setComicsList(comic);
     });
+
+    checkFavoriteStatus(comicId); // Check favorite status
   }, [comicId]);
+
+  const checkFavoriteStatus = async (comicId) => {
+    const user = auth.currentUser;
+    if (user) {
+      const userDoc = await db.collection('users').doc(user.uid).get();
+      const userData = userDoc.data();
+      if (userData.favorites && userData.favorites.includes(comicId)) {
+        setIsFavorite(true);
+      }
+    }
+  };
+
+  const handleFavoritePress = async () => {
+    setIsFavorite(!isFavorite);
+    toggleFavoriteComic(comicId); // Call the new function
+  };
 
   const handlePress = (chapterId) => {
     const currentChapterIndex = chapters.findIndex(chapter => chapter.id === chapterId);
@@ -45,7 +65,7 @@ const Chapters = () => {
           <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
             <Image style={styles.buttonImg} source={require('../../assets/icon/backIcon.png')}></Image>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => setIsFavorite(!isFavorite)}>
+          <TouchableOpacity style={styles.button} onPress={handleFavoritePress}>
             <Image style={styles.buttonImg} source={isFavorite ? require('../../assets/icon/heartIconActive.png') : require('../../assets/icon/heartIcon.png')}></Image>
           </TouchableOpacity>
         </View>
