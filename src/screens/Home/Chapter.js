@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Dimensions, FlatList } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { fetchChapters, fetchComicDetails } from '../../api/api';  // Bạn cần tạo hàm fetchComicDetails trong file API
+import { fetchChapters, fetchComicsList } from '../../api/api';  // Bạn cần tạo hàm fetchComicDetails trong file API
 import { BlurView } from 'expo-blur';
 import Constants from 'expo-constants';
 
@@ -11,14 +11,17 @@ const Chapters = () => {
   const route = useRoute();
   const { comicId } = route.params;
   const [chapters, setChapters] = useState([]);
-  const [comicDetails, setComicDetails] = useState({});
+  const [comicsList, setComicsList] = useState({});
   const navigation = useNavigation();
   const [isRead, setIsRead] = useState(true);  // Biến isRead để kiểm soát hiển thị
   const [isFavorite, setIsFavorite] = useState(false);  // Biến isFavorite để kiểm soát icon heart
 
   useEffect(() => {
     fetchChapters(comicId).then(setChapters);
-    fetchComicDetails(comicId).then(setComicDetails);  // Fetch comic details
+    fetchComicsList().then(comics => {
+      const comic = comics.find(c => c.id === comicId);
+      setComicsList(comic);
+    });
   }, [comicId]);
 
   const handlePress = (chapterId) => {
@@ -33,7 +36,7 @@ const Chapters = () => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={{ uri: comicDetails.ImgURL }} style={styles.comicImage} resizeMode="cover">
+      <ImageBackground source={{ uri: comicsList.ImgURL }} style={styles.comicImage} resizeMode="cover">
         <BlurView intensity={50} style={styles.blurView} />
         <View style={styles.topNav}>
           <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
@@ -45,10 +48,10 @@ const Chapters = () => {
         </View>
         <View style={[styles.detailsContainer]}>
           <View style={styles.details}>
-            <Image source={{ uri: comicDetails.ImgURL }} style={styles.detailImage}></Image>
-            <Text style={styles.comicTitle}>{comicDetails.Title}</Text>
-            <Text style={styles.comicAuthor}>Series: {comicDetails.Author}</Text>
-            <Text style={styles.comicInfo}>Genre</Text>
+            <Image source={{ uri: comicsList.ImgURL }} style={styles.detailImage}></Image>
+            <Text style={styles.comicTitle}>{comicsList.Title}</Text>
+            <Text style={styles.comicAuthor}>Author: {comicsList.Author}</Text>
+            <Text style={styles.comicInfo}>Genre: {comicsList.Genre}</Text>
           </View>
           {isRead && (
             <>

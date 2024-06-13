@@ -1,6 +1,9 @@
 import 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { firebase } from './firebaseConfig';
 
 import SignIn from './src/screens/SignIn/SignIn';
 import SignInForm from './src/screens/SignIn/SignInForm';
@@ -28,37 +31,55 @@ const noSlideTransition = {
   },
 };
 
-function StackNavigator() {
+
+function StackNavigator({ isLoggedIn }) {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="SignIn" component={SignIn} />
-      <Stack.Screen name="SignInForm" component={SignInForm} />
-      <Stack.Screen name="SignUpForm" component={SignUpForm} />
-      <Stack.Screen name="Chapters" component={Chapters} />
-      <Stack.Screen name="ChapterPages" component={ChapterPages} />
-      <Stack.Screen 
-        name="Home" 
-        component={Home} 
-        options={noSlideTransition} // Disable slide animation for Home
-      />
-      <Stack.Screen 
-        name="Search" 
-        component={Search} 
-        options={noSlideTransition} // Disable slide animation for Search
-      />
-      <Stack.Screen 
-        name="Profile" 
-        component={Profile} 
-        options={noSlideTransition} // Disable slide animation for Profile
-      />
+      {isLoggedIn ? (
+        <>
+          <Stack.Screen name="Home" component={Home} options={noSlideTransition} />
+          <Stack.Screen name="Search" component={Search} options={noSlideTransition} />
+          <Stack.Screen name="Profile" component={Profile} options={noSlideTransition} />
+          <Stack.Screen name="Chapters" component={Chapters} />
+          <Stack.Screen name="ChapterPages" component={ChapterPages} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="SignIn" component={SignIn} />
+          <Stack.Screen name="SignInForm" component={SignInForm} />
+          <Stack.Screen name="SignUpForm" component={SignUpForm} />
+        </>
+      )}
     </Stack.Navigator>
   );
 }
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+
+  useEffect(() => {
+    const checkLoginStatus = async() => {
+        // Check Firebase auth status
+        firebase.auth().onAuthStateChanged(user => {
+          // if (user) {
+          //   setIsLoggedIn(true);
+          // } else {
+          //   setIsLoggedIn(false);
+          // }
+          setIsLoggedIn(!!user)
+        });
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  if (isLoggedIn === null) {
+    return null; // Hiển thị màn hình chờ hoặc loading nếu cần thiết
+  }
+
   return (
     <NavigationContainer>
-      <StackNavigator />
+      <StackNavigator isLoggedIn={isLoggedIn} />
     </NavigationContainer>
   );
 }

@@ -1,21 +1,5 @@
 import { db, storage } from '../../firebaseConfig';
 
-// Lấy chi tiết truyện tranh
-const fetchComicDetails = async (comicId) => {
-  try {
-    const comicDoc = await db.collection('comics').doc(comicId).get();
-    if (comicDoc.exists) {
-      return { id: comicDoc.id, ...comicDoc.data() };
-    } else {
-      console.error('No such document!');
-      return {};
-    }
-  } catch (error) {
-    console.error('Error fetching comic details from Firestore:', error);
-    return {};
-  }
-};
-
 // Lấy danh sách truyện tranh
 const fetchComicsList = async () => {
   try {
@@ -100,4 +84,4 @@ const fetchChapterPages = async (comicId, chapterId) => {
   }
 };
 
-export { fetchComicsList, fetchGenresList, fetchChapters, fetchComicDetails, fetchChapterPages };
+export { fetchComicsList, fetchGenresList, fetchChapters, fetchChapterPages };

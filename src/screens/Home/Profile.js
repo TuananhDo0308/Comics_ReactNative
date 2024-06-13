@@ -6,6 +6,7 @@ import ComicGerne from '../../components/ComicGerne';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
 import Modal from 'react-native-modal';
 import { PanGestureHandler } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ const Profile = () => {
     });
   }, []);
 
+
   const handleGesture = (event) => {
     const { translationY } = event.nativeEvent;
     if (translationY > 0) {
@@ -41,9 +43,9 @@ const Profile = () => {
     setTranslateY(0);
   };
 
-  const handleLogout = () => {
-    // Thêm logic đăng xuất ở đây
-    console.log("Logged out");
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('loggedIn'); // Xóa trạng thái đăng nhập
+    navigation.navigate('SignIn'); // Điều hướng đến màn hình đăng nhập
   };
 
   return (

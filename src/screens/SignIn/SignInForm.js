@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput,Dimensions,Platform, TouchableOpacity, Image, StyleSheet, SafeAreaView, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../../../firebaseConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -12,19 +13,19 @@ const SignInForm = () => {
   const passwordInputRef = useRef(null);  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const signIn = () => {
+
+  const signIn = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password');
       return;
     }
-    firebase.auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        navigation.replace('Home')
-      })
-      .catch((error) => {
-        Alert.alert('Error', 'Your email or password is incorrect');
-      });
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+      await AsyncStorage.setItem('loggedIn', 'true');
+      navigation.replace('Home');
+    } catch (error) {
+      Alert.alert('Error', 'Your email or password is incorrect');
+    }
   }
   return (
     <SafeAreaView style={styles.container}>
