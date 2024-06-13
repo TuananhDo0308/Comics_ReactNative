@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Dimensions, Image, Text, Platform } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Dimensions, Image, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
@@ -7,11 +7,10 @@ import { useColorScheme } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
-const ChapterPagesNavigation = ({ totalChapters, currentChapter, onChapterChange }) => {
+const ChapterPagesNavigation = ({ chapters, currentChapter, onChapterChange, onToggleDarkMode, isDarkMode }) => {
   const navigation = useNavigation();
   const [selectedChapter, setSelectedChapter] = useState(currentChapter);
   const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === 'dark';
 
   const handleChapterChange = (chapter) => {
     setSelectedChapter(chapter);
@@ -22,28 +21,37 @@ const ChapterPagesNavigation = ({ totalChapters, currentChapter, onChapterChange
     <View style={styles.container}>
       <BlurView intensity={50} style={styles.navBar}>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.goBack()}>
-          <Image style={styles.image} source={require('../assets/icon/logoutIcon.png')} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => handleChapterChange(selectedChapter - 1)}>
-          <Image style={styles.image} source={require('../assets/icon/logoutIcon.png')} />
-        </TouchableOpacity>
-        <Picker
-          selectedValue={selectedChapter}
-          style={styles.picker}
-          onValueChange={(itemValue) => handleChapterChange(itemValue)}
-        >
-          {Array.from({ length: totalChapters }, (_, i) => (
-            <Picker.Item key={i + 1} label={`Chapter ${i + 1}`} value={i + 1} />
-          ))}
-        </Picker>
-        <TouchableOpacity style={styles.navButton} onPress={() => handleChapterChange(selectedChapter + 1)}>
-          <Image style={styles.image} source={require('../assets/icon/logoutIcon.png')} />
+          <Image style={styles.image} source={require('../assets/icon/closeIcon.png')} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton} onPress={() => {
-          const newColorScheme = isDarkMode ? 'light' : 'dark';
-          // Handle theme change here
+          const index = chapters.indexOf(selectedChapter);
+          if (index > 0) {
+            handleChapterChange(chapters[index - 1]);
+          }
         }}>
-          <Image style={styles.image} source={require('../assets/icon/logoutIcon.png')} />
+          <Image style={styles.image} source={require('../assets/icon/backIcon.png')} />
+        </TouchableOpacity>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedChapter}
+            style={styles.picker}
+            onValueChange={(itemValue) => handleChapterChange(itemValue)}
+          >
+            {chapters.map((chapter, index) => (
+              <Picker.Item key={index} label={chapter} value={chapter} />
+            ))}
+          </Picker>
+        </View>
+        <TouchableOpacity style={styles.navButton} onPress={() => {
+          const index = chapters.indexOf(selectedChapter);
+          if (index < chapters.length - 1) {
+            handleChapterChange(chapters[index + 1]);
+          }
+        }}>
+          <Image style={[styles.image, styles.imageRotate]} source={require('../assets/icon/backIcon.png')} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navButton} onPress={onToggleDarkMode}>
+          <Image style={styles.image} source={isDarkMode ? require('../assets/icon/darkIcon.png') : require('../assets/icon/lightIcon.png')} />
         </TouchableOpacity>
       </BlurView>
     </View>
@@ -93,10 +101,17 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
-  picker: {
+  imageRotate: {
+    transform: [{ rotate: '180deg' }],
+  },
+  pickerContainer: {
     flex: 3,
+    height: '100%',
+    justifyContent: 'center',
+  },
+  picker: {
     color: 'white',
-    height: 50,
+    width: '100%',
   },
 });
 
