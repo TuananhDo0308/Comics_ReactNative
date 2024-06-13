@@ -21,7 +21,6 @@ const ChapterPages = () => {
     fetchChapterPdf(comicId, chapterId).then((data) => {
       setPdfSource(data);
     });
-
   }, [comicId, chapterId]);
 
   useEffect(() => {
@@ -48,20 +47,6 @@ const ChapterPages = () => {
 
   return (
     <View style={[styles.container, isDarkMode ? styles.darkBackground : styles.lightBackground]}>
-      {/* {urls.length > 0 ? (
-        <FlatList
-          data={urls}
-          renderItem={({ item }) => (
-            <WebView
-              source={{ uri: `https://docs.google.com/viewer?url=${encodeURIComponent(item)}&embedded=true` }}
-              style={styles.webview}
-            />
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      ) : (
-        <Text>Loading...</Text>
-      )} */}
       {loading ? (
         <Text>Loading...</Text>
       ) : urls.length > 0 ? (
@@ -79,7 +64,7 @@ const ChapterPages = () => {
         <ChapterPagesNavigation
           chapters={chapters}
           currentChapter={currentChapter}
-          onChapterChange={handleChapterChange}
+          onChapterChange={(newChapter) => handleChapterChange(newChapter)}
           onToggleDarkMode={toggleDarkMode}
           isDarkMode={isDarkMode}
         />
@@ -93,9 +78,11 @@ export default ChapterPages;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   webview: {
-    width: width-20,
+    width: width + 200,
     height: height,
   },
   navigationContainer: {

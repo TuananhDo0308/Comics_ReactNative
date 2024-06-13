@@ -25,8 +25,11 @@ const Chapters = () => {
   }, [comicId]);
 
   const handlePress = (chapterId) => {
-    navigation.navigate('ChapterPages', { comicId, chapterId });
+    const currentChapterIndex = chapters.findIndex(chapter => chapter.id === chapterId);
+    const currentChapter = chapters[currentChapterIndex];
+    navigation.navigate('ChapterPages', { comicId, chapterId, chapters, currentChapter });
   };
+  
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.chapterItem} onPress={() => handlePress(item.id)} key={item.id}>

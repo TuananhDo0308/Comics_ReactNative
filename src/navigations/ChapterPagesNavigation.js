@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions, Image, Platform } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import { useColorScheme } from 'react-native';
@@ -11,6 +10,10 @@ const ChapterPagesNavigation = ({ chapters, currentChapter, onChapterChange, onT
   const navigation = useNavigation();
   const [selectedChapter, setSelectedChapter] = useState(currentChapter);
   const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    setSelectedChapter(currentChapter);
+  }, [currentChapter]);
 
   const handleChapterChange = (chapter) => {
     setSelectedChapter(chapter);
@@ -31,17 +34,6 @@ const ChapterPagesNavigation = ({ chapters, currentChapter, onChapterChange, onT
         }}>
           <Image style={styles.image} source={require('../assets/icon/backIcon.png')} />
         </TouchableOpacity>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedChapter}
-            style={styles.picker}
-            onValueChange={(itemValue) => handleChapterChange(itemValue)}
-          >
-            {chapters.map((chapter, index) => (
-              <Picker.Item key={index} label={chapter} value={chapter} />
-            ))}
-          </Picker>
-        </View>
         <TouchableOpacity style={styles.navButton} onPress={() => {
           const index = chapters.indexOf(selectedChapter);
           if (index < chapters.length - 1) {
@@ -50,9 +42,7 @@ const ChapterPagesNavigation = ({ chapters, currentChapter, onChapterChange, onT
         }}>
           <Image style={[styles.image, styles.imageRotate]} source={require('../assets/icon/backIcon.png')} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={onToggleDarkMode}>
-          <Image style={styles.image} source={isDarkMode ? require('../assets/icon/darkIcon.png') : require('../assets/icon/lightIcon.png')} />
-        </TouchableOpacity>
+        
       </BlurView>
     </View>
   );
@@ -62,7 +52,7 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: 35,
-    width: width - 80,
+    width: 200,
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
@@ -98,20 +88,11 @@ const styles = StyleSheet.create({
   },
   image: {
     tintColor: 'white',
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
   },
   imageRotate: {
     transform: [{ rotate: '180deg' }],
-  },
-  pickerContainer: {
-    flex: 3,
-    height: '100%',
-    justifyContent: 'center',
-  },
-  picker: {
-    color: 'white',
-    width: '100%',
   },
 });
 
