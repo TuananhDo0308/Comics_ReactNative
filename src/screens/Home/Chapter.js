@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Dimensions, FlatList } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { fetchChapters, fetchComicDetails } from '../../api/api';  // Bạn cần tạo hàm fetchComicDetails trong file API
 import { BlurView } from 'expo-blur';
 import Constants from 'expo-constants';
@@ -15,9 +13,8 @@ const Chapters = () => {
   const [chapters, setChapters] = useState([]);
   const [comicDetails, setComicDetails] = useState({});
   const navigation = useNavigation();
-  
-  const translateY = useSharedValue(0);
-  const [showFull, setShowFull] = useState(false);
+  const [isRead, setIsRead] = useState(true);  // Biến isRead để kiểm soát hiển thị
+  const [isFavorite, setIsFavorite] = useState(false);  // Biến isFavorite để kiểm soát icon heart
 
   useEffect(() => {
     fetchChapters(comicId).then(setChapters);
@@ -28,27 +25,7 @@ const Chapters = () => {
     navigation.navigate('ChapterPages', { comicId, chapterId });
   };
 
-  const onGestureEvent = (event) => {
-    translateY.value = event.translationY;
-  };
-
-  const onHandlerStateChange = (event) => {
-    if (event.nativeEvent.state === State.END) {
-      if (event.nativeEvent.translationY < -50) {
-        setShowFull(true);
-      } else {
-        translateY.value = withSpring(0);
-      }
-    }
-  };
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateY: showFull ? -height / 2 : translateY.value }],
-    };
-  });
-
-  const renderItem = (item) => (
+  const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.chapterItem} onPress={() => handlePress(item.id)} key={item.id}>
       <Text style={styles.chapterTitle}>{item.Title}</Text>
     </TouchableOpacity>
@@ -59,24 +36,36 @@ const Chapters = () => {
       <ImageBackground source={{ uri: comicDetails.ImgURL }} style={styles.comicImage} resizeMode="cover">
         <BlurView intensity={50} style={styles.blurView} />
         <View style={styles.topNav}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
             <Image style={styles.buttonImg} source={require('../../assets/icon/backIcon.png')}></Image>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Image style={styles.buttonImg} source={require('../../assets/icon/backIcon.png')}></Image>
+          <TouchableOpacity style={styles.button} onPress={() => setIsFavorite(!isFavorite)}>
+            <Image style={styles.buttonImg} source={isFavorite ? require('../../assets/icon/heartIconActive.png') : require('../../assets/icon/heartIcon.png')}></Image>
           </TouchableOpacity>
         </View>
-        <Animated.View style={[styles.detailsContainer, animatedStyle]}>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
-            <View style={styles.details}>
-              <Image source={{uri:comicDetails.ImgURL}} style={styles.detailImage}></Image>
-              <Text style={styles.comicTitle}>{comicDetails.Title}</Text>
-              <Text style={styles.comicAuthor}>Series: {comicDetails.Author}</Text>
-              <Text style={styles.comicInfo}>Genre</Text>
-            </View>
-            {chapters.map(renderItem)}
-          </ScrollView>
-        </Animated.View>
+        <View style={[styles.detailsContainer]}>
+          <View style={styles.details}>
+            <Image source={{ uri: comicDetails.ImgURL }} style={styles.detailImage}></Image>
+            <Text style={styles.comicTitle}>{comicDetails.Title}</Text>
+            <Text style={styles.comicAuthor}>Series: {comicDetails.Author}</Text>
+            <Text style={styles.comicInfo}>Genre</Text>
+          </View>
+          {isRead && (
+            <>
+              <Text style={styles.Chapters}>Continue Reading:</Text>
+              <TouchableOpacity style={[styles.chapterItem, { marginHorizontal: 20 }]}>
+                <Text style={styles.chapterTitle}>item</Text>
+              </TouchableOpacity>
+            </>
+          )}
+          <Text style={styles.Chapters}>Chapters:</Text>
+          <FlatList
+            contentContainerStyle={styles.scrollContent}
+            data={chapters}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
       </ImageBackground>
     </View>
   );
@@ -99,9 +88,9 @@ const styles = StyleSheet.create({
   detailsContainer: {
     flex: 1,
     backgroundColor: 'rgba(20, 20, 20, 0.8)',
-    borderTopStartRadius:30,
-    borderTopEndRadius:30,
-    paddingTop:20,
+    borderTopStartRadius: 30,
+    borderTopEndRadius: 30,
+    paddingTop: 20,
   },
   details: {
     padding: 20,
@@ -116,7 +105,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: 'white',
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginVertical: 10,
+  },
+  Chapters: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
+    marginVertical: 20,
+    marginHorizontal: 20,
   },
   comicAuthor: {
     fontSize: 16,
@@ -129,26 +125,30 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 20,
+    gap: 15,
+    height: 400,
+    marginHorizontal: 20,
   },
   chapterItem: {
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    backgroundColor: 'rgba(200, 200, 200, 0.5)',
+    borderRadius: 100,
+    paddingHorizontal: 20,
   },
   chapterTitle: {
     fontSize: 18,
     color: 'white',
   },
   topNav: {
-    paddingTop: Constants.statusBarHeight ,
-    paddingBottom:20,
+    paddingTop: Constants.statusBarHeight,
+    paddingBottom: 20,
     flexDirection: 'row',
     width: width,
     justifyContent: 'space-between',
   },
   button: {
     height: 25,
-    marginHorizontal:20,
+    marginHorizontal: 20,
     width: 25,
   },
   buttonImg: {

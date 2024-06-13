@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
+import { useNavigation } from '@react-navigation/native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const MyCarousel = ({ data }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navigation = useNavigation();
 
   const renderItem = ({ item }) => (
-    <View style={styles.comicItem}>
+    <TouchableOpacity style={styles.comicItem} onPress={() => navigation.navigate('Chapters', { comicId: item.id })}>
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: item.ImgURL }}
           style={styles.coverImage}
         />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
   },
   comicInfo: {
     marginTop: 10,
-    marginLeft:10,
+    marginLeft: 10,
     alignItems: 'flex-start',
     width: screenWidth,
   },

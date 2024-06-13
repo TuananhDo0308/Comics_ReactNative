@@ -1,11 +1,18 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
 const ComicItem = ({ item }) => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    navigation.navigate('Chapters', { comicId: item.id });
+  };
+
   return (
-    <View style={styles.comicItem}>
+    <TouchableOpacity style={styles.comicItem} onPress={handlePress}>
       <Image
         source={{ uri: item.ImgURL }}
         style={styles.coverImage}
@@ -15,7 +22,7 @@ const ComicItem = ({ item }) => {
         <Text style={styles.author}>Author: {item.Author}</Text>
         <Text style={styles.chapters}>Chapters: {item.chapterCount}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

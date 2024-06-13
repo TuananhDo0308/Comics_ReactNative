@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, Dimensions, Image, ImageBackground, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { useNavigationState } from '@react-navigation/native';
+import { useNavigationState, useNavigation } from '@react-navigation/native';
 import { fetchComicsList } from '../../api/api';
 import ComicGerne from '../../components/ComicGerne';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
@@ -15,6 +15,7 @@ const Profile = () => {
   const [currentComicId, setCurrentComicId] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [translateY, setTranslateY] = useState(0);
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchComicsList().then(comics => {
@@ -40,6 +41,11 @@ const Profile = () => {
     setTranslateY(0);
   };
 
+  const handleLogout = () => {
+    // Thêm logic đăng xuất ở đây
+    console.log("Logged out");
+  };
+
   return (
     <ImageBackground 
       source={require('../../assets/background.jpg')} 
@@ -47,6 +53,11 @@ const Profile = () => {
     >
       <View style={styles.overlay}>
         <SafeAreaView style={styles.container}>
+          <View style={styles.topNav}>
+            <TouchableOpacity style={styles.button} onPress={handleLogout}>
+              <Image style={styles.buttonImg} source={require('../../assets/icon/logoutIcon.png')}></Image>
+            </TouchableOpacity>
+          </View>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.infoSpace}>
                 <Image style={styles.avatar} source={require('../../assets/img1.jpg')}/>
@@ -127,52 +138,51 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20, 20, 20, 0.9)', 
     width: '100%',
     justifyContent: 'flex-start',
-    alignItems:'center',
+    alignItems: 'center',
   },
   scrollContainer: {
     alignItems: 'center',
-    paddingBottom:80,
+    paddingBottom: 80,
   },
   userName: {
     color: 'white',
-    marginTop:20,
+    marginTop: 20,
     fontSize: 24,
   },
-  infoSpace:{
-    flexDirection:'column',
-    marginTop:20,
-    alignItems:'center',
+  infoSpace: {
+    flexDirection: 'column',
+    alignItems: 'center',
   },
-  avatar:{
-    height:100,
-    width:100,
-    borderRadius:1000,
+  avatar: {
+    height: 100,
+    width: 100,
+    borderRadius: 1000,
   },
-  editButton:{
-    marginTop:20,
-    borderRadius:100,
-    height:40,
-    width:90,
-    alignItems:'center',
-    justifyContent:'center',
+  editButton: {
+    marginTop: 20,
+    borderRadius: 100,
+    height: 40,
+    width: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'rgba(200, 200, 200, 0.5)', 
   },
   horizontalScroll2: {
     paddingLeft: 10, // Thêm khoảng cách giữa các mục
   },
-  continueRead:{
-    flexDirection:'column',
-    alignItems:'flex-start',
-    justifyContent:'flex-start',
-    width:width-20,
-    marginVertical:20,
-    marginHorizontal:10,
+  continueRead: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    width: width - 20,
+    marginVertical: 20,
+    marginHorizontal: 10,
   },
-  continueReadTitle:{
-    fontSize:16,
-    fontWeight:'500',
-    color:'grey',
-    marginLeft:5
+  continueReadTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'grey',
+    marginLeft: 5,
   },
   modal: {
     justifyContent: 'flex-end',
@@ -196,5 +206,24 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  topNav: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    zIndex: 10,
+  },
+  button: {
+    height: 20,
+    marginHorizontal: 20,
+    width: 20,
+  },
+  buttonImg: {
+    height: 20,
+    width: 20,
+    tintColor: 'white', // Đảm bảo biểu tượng có màu trắng
   },
 });

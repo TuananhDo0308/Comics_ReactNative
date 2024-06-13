@@ -135,7 +135,7 @@ const Home = () => {
               </View>
             )}
             keyExtractor={item => item.id}
-            contentContainerStyle={{ paddingBottom: 10 }} // Thêm khoảng cách dưới
+            // Thêm khoảng cách dưới
           />
         </Animated.ScrollView>
         <Animated.View style={[styles.bottomNav, { transform: [{ translateY: bottomNavTranslateY }] }]}>
