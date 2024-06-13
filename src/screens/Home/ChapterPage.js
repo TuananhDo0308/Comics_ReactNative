@@ -1,39 +1,30 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Image, StyleSheet, Dimensions, Animated, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { fetchChapterPages } from '../../api/api';
+import { WebView } from 'react-native-webview';
 import ChapterPagesNavigation from '../../navigations/ChapterPagesNavigation';
 
-const { width } = Dimensions.get('window');
-const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+const { width, height } = Dimensions.get('window');
 
 const ChapterPages = () => {
   const route = useRoute();
   const { comicId, chapterId } = route.params;
-  const [pages, setPages] = useState([]);
+  const [pdfSource, setPdfSource] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(`Chapter ${chapterId}`);
-  const [isDarkMode, setIsDarkMode] = useState(false); // Thêm trạng thái để quản lý chế độ nền
-  const scrollY = useRef(new Animated.Value(0)).current;
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const chapters = Array.from({ length: 10 }, (_, i) => `Chapter ${i + 1}`); // Mảng giả với 10 chương
 
   useEffect(() => {
-    fetchChapterPages(comicId, chapterId).then((data) => {
-      setPages(data);
+    fetchChapterPdf(comicId, chapterId).then((data) => {
+      setPdfSource(data);
     });
   }, [comicId, chapterId]);
-
-  const navigationTranslateY = scrollY.interpolate({
-    inputRange: [0, 50],
-    outputRange: [0, 100],
-    extrapolate: 'clamp',
-  });
 
   const handleChapterChange = (chapter) => {
     const chapterIndex = chapters.indexOf(chapter) + 1;
     setCurrentChapter(chapter);
-    // Fetch new chapter pages
-    fetchChapterPages(comicId, chapterIndex).then((data) => {
-      setPages(data);
+    fetchChapterPdf(comicId, chapterIndex).then((data) => {
+      setPdfSource(data);
     });
   };
 
@@ -43,26 +34,21 @@ const ChapterPages = () => {
 
   return (
     <View style={[styles.container, isDarkMode ? styles.darkBackground : styles.lightBackground]}>
-      <AnimatedFlatList
-        data={pages}
-        renderItem={({ item }) => (
-          <Image source={{ uri: item }} style={styles.pageImage} resizeMode="contain" />
-        )}
-        keyExtractor={(item, index) => index.toString()}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
-      />
-      <Animated.View style={[styles.navigationContainer, { transform: [{ translateY: navigationTranslateY }] }]}>
+      {pdfSource && (
+        <WebView
+          source={{ uri: `https://docs.google.com/viewer?url=${pdfSource}&embedded=true` }}
+          style={styles.webview}
+        />
+      )}
+      <View style={styles.navigationContainer}>
         <ChapterPagesNavigation
           chapters={chapters}
           currentChapter={currentChapter}
           onChapterChange={handleChapterChange}
-          onToggleDarkMode={toggleDarkMode} // Truyền hàm chuyển đổi chế độ nền
-          isDarkMode={isDarkMode} // Truyền trạng thái nền hiện tại
+          onToggleDarkMode={toggleDarkMode}
+          isDarkMode={isDarkMode}
         />
-      </Animated.View>
+      </View>
     </View>
   );
 };
@@ -73,10 +59,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  pageImage: {
+  webview: {
+    flex: 1,
     width: width,
-    height: undefined,
-    aspectRatio: 0.75, // Bạn có thể điều chỉnh aspectRatio theo tỷ lệ của ảnh
+    height: height,
   },
   navigationContainer: {
     position: 'absolute',
@@ -91,3 +77,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
 });
+
+// Mock function to fetch PDF source URL
+const fetchChapterPdf = async (comicId, chapterId) => {
+  // Replace this with your actual logic to fetch the PDF URL
+  // Here we use a placeholder PDF file for demonstration
+  return '';
+};
