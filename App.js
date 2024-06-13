@@ -35,14 +35,14 @@ const noSlideTransition = {
 function StackNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={Home} options={noSlideTransition} />
-      <Stack.Screen name="Search" component={Search} options={noSlideTransition} />
-      <Stack.Screen name="Profile" component={Profile} options={noSlideTransition} />
-      <Stack.Screen name="Chapters" component={Chapters} />
-      <Stack.Screen name="ChapterPages" component={ChapterPages} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignInForm" component={SignInForm} />
       <Stack.Screen name="SignUpForm" component={SignUpForm} />
+      <Stack.Screen name="Chapters" component={Chapters} />
+      <Stack.Screen name="ChapterPages" component={ChapterPages} />
+      <Stack.Screen name="Home" component={Home} options={noSlideTransition} />
+      <Stack.Screen name="Search" component={Search} options={noSlideTransition} />
+      <Stack.Screen name="Profile" component={Profile} options={noSlideTransition} />
     </Stack.Navigator>
   );
 }

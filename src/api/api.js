@@ -84,4 +84,24 @@ const fetchChapterPages = async (comicId, chapterId) => {
   }
 };
 
-export { fetchComicsList, fetchGenresList, fetchChapters, fetchChapterPages };
+const fetchChapterPdfUrls = async (comicId, chapterId) => {
+  try {
+    const chapterDoc = await db.collection('comics').doc(comicId).collection('Chapters').doc(chapterId).get();
+    if (chapterDoc.exists) {
+      const contents = chapterDoc.data().Content; // Mảng URL của các tệp PDF dạng `gs://`
+      const urls = await Promise.all(contents.map(async (content) => {
+        const storageRef = storage.refFromURL(content); // Tạo tham chiếu từ URL
+        return await storageRef.getDownloadURL(); // Lấy URL tải xuống
+      }));
+      console.log('Number of URLs:', urls.length);
+      return urls; // Trả về mảng URL tải xuống
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching chapter pages from Firestore:', error);
+    return [];
+  }
+};
+
+export { fetchComicsList, fetchGenresList, fetchChapters, fetchChapterPages, fetchChapterPdfUrls };
