@@ -8,14 +8,16 @@ const { width } = Dimensions.get('window');
 
 const ChapterPages = () => {
   const route = useRoute();
-  const { chapterId } = route.params;
+  const { comicId, chapterId } = route.params;
   const [pages, setPages] = useState([]);
 
   useEffect(() => {
-    fetchChapterPages(chapterId).then(setPages);
-  }, [chapterId]);
+    fetchChapterPages(comicId, chapterId).then((data) => {
+      setPages(data);
+    });
+  }, [comicId, chapterId]);
 
-  return (
+  return ( 
     <View style={styles.container}>
       <FlatList
         data={pages}

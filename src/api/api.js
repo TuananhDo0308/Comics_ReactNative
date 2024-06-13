@@ -1,4 +1,4 @@
-import { db } from '../../firebaseConfig';
+import { db, storage } from '../../firebaseConfig';
 
 // Lấy chi tiết truyện tranh
 const fetchComicDetails = async (comicId) => {
@@ -30,7 +30,11 @@ const fetchComicsList = async () => {
       const genreDoc = await genreRef.get();
       const genreData = genreDoc.exists ? genreDoc.data() : { Genre: 'Unknown' };
 
-      comicsList.push({ id: doc.id, ...comicData, Genre: genreData.Genre });
+      // Đếm số lượng chương của truyện
+      const chaptersSnapshot = await db.collection('comics').doc(doc.id).collection('Chapters').get();
+      const chapterCount = chaptersSnapshot.size;
+
+      comicsList.push({ id: doc.id, ...comicData, Genre: genreData.Genre, chapterCount });
     }
 
     return comicsList;
@@ -64,7 +68,7 @@ const fetchGenresList = async () => {
 const fetchChapters = async (comicId) => {
   try {
     const chaptersList = [];
-    const querySnapshot = await db.collection('comics').doc(comicId).collection('Chapters').get();
+    const querySnapshot = await db.collection('comics').doc(comicId).collection('Chapters').orderBy('Title', 'desc').get();
     querySnapshot.forEach(doc => {
       if (doc.exists) {
         chaptersList.push({ id: doc.id, ...doc.data() });
@@ -77,4 +81,23 @@ const fetchChapters = async (comicId) => {
   }
 };
 
-export { fetchComicsList, fetchGenresList, fetchChapters, fetchComicDetails };
+const fetchChapterPages = async (comicId, chapterId) => {
+  try {
+    const chapterDoc = await db.collection('comics').doc(comicId).collection('Chapters').doc(chapterId).get();
+    if (chapterDoc.exists) {
+      const contents = chapterDoc.data().Content; // Mảng URL dạng `gs://`
+      const urls = await Promise.all(contents.map(async (content) => {
+        const storageRef = storage.refFromURL(content); // Tạo tham chiếu từ URL
+        return await storageRef.getDownloadURL(); // Lấy URL tải xuống
+      }));
+      return urls; // Trả về mảng URL tải xuống
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching chapter pages from Firestore:', error);
+    return [];
+  }
+};
+
+export { fetchComicsList, fetchGenresList, fetchChapters, fetchComicDetails, fetchChapterPages };

@@ -13,7 +13,7 @@ const ComicItem = ({ item }) => {
       <View style={styles.infoContainer}>
         <Text style={styles.title}>{item.Title}</Text>
         <Text style={styles.author}>Author: {item.Author}</Text>
-        <Text style={styles.chapters}>Chapters: {item.Chapters}</Text>
+        <Text style={styles.chapters}>Chapters: {item.chapterCount}</Text>
       </View>
     </View>
   );
