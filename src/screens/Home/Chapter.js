@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Dimensions, FlatList } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { fetchChapters, fetchComicsList } from '../../api/api';  // Bạn cần tạo hàm fetchComicDetails trong file API
+import { fetchChapters, fetchComicsList, addToCurrentReading } from '../../api/api';  // Bạn cần tạo hàm fetchComicDetails trong file API
 import { BlurView } from 'expo-blur';
 import Constants from 'expo-constants';
 import { auth, db } from '../../../firebaseConfig'
-import { toggleFavoriteComic } from '../../api/api';
+import { toggleFavoriteComic, updateCurrentReading } from '../../api/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -44,7 +44,8 @@ const Chapters = () => {
     toggleFavoriteComic(comicId); // Call the new function
   };
 
-  const handlePress = (chapterId) => {
+  const handlePress = async(chapterId) => {
+    await addToCurrentReading(comicId); 
     const currentChapterIndex = chapters.findIndex(chapter => chapter.id === chapterId);
     const currentChapter = chapters[currentChapterIndex];
     navigation.navigate('ChapterPages', { comicId, chapterId, chapters, currentChapter });

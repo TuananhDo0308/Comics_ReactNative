@@ -129,4 +129,44 @@ const fetchFavoriteComics = async () => {
   return [];
 };
 
-export { fetchComicsList, fetchGenresList, fetchChapters, fetchFavoriteComics, toggleFavoriteComic, fetchChapterPdfUrls };
+const addToCurrentReading = async (comicId) => {
+  const user = auth.currentUser;
+  if (user) {
+    const userRef = db.collection('users').doc(user.uid);
+    const userDoc = await userRef.get();
+    const userData = userDoc.data();
+
+    const updatedCurrentReading = userData.currentReading || [];
+    const readingExists = updatedCurrentReading.some((reading) => reading.comicId === comicId);
+
+    if (!readingExists) {
+      updatedCurrentReading.push({ comicId });
+      await userRef.update({ currentReading: updatedCurrentReading });
+    }
+  }
+};
+
+// Hàm lấy danh sách truyện đang đọc
+const fetchCurrentReading = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    const userRef = db.collection('users').doc(user.uid);
+    const userDoc = await userRef.get();
+    const userData = userDoc.data();
+
+    const currentReading = userData.currentReading || [];
+
+    // Lấy thông tin chi tiết của từng truyện
+    const detailedReadingList = await Promise.all(
+      currentReading.map(async (reading) => {
+        const comicDoc = await db.collection('comics').doc(reading.comicId).get();
+        return { ...comicDoc.data(), comicId: reading.comicId };
+      })
+    );
+
+    return detailedReadingList;
+  }
+  return [];
+};
+export { fetchComicsList, fetchGenresList, fetchChapters, fetchFavoriteComics, toggleFavoriteComic, 
+  fetchChapterPdfUrls, addToCurrentReading, fetchCurrentReading };

@@ -3,7 +3,7 @@ import { View, Text, Image, Animated, StyleSheet, StatusBar, ImageBackground, Fl
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
-import { fetchComicsList, fetchGenresList } from '../../api/api';
+import { fetchComicsList, fetchGenresList, fetchCurrentReading } from '../../api/api';
 import ComicItem from '../../components/HighlightComic';
 import ComicGerne from '../../components/ComicGerne';
 import { BlurView } from 'expo-blur';
@@ -14,6 +14,7 @@ const { width, height } = Dimensions.get('window');
 const Home = () => {
   const [comicsList, setComicsList] = useState([]);
   const [currentComicId, setCurrentComicId] = useState(null);
+  const [currentReading, setCurrentReading] = useState([]);
   const [genresList, setGenresList] = useState([]);
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -29,6 +30,10 @@ const Home = () => {
     fetchGenresList().then(genres => {
       setGenresList(genres);
     });
+  }, []);
+
+  useEffect(() => {
+    fetchCurrentReading().then(setCurrentReading);
   }, []);
 
   const handlePress = (comicId) => {
@@ -111,7 +116,7 @@ const Home = () => {
             <Text style={styles.continueReadTitle}>
               CONTINUE READING
             </Text>
-            <MyCarousel data={comicsList} />
+            <MyCarousel data={currentReading} />
           </View>
 
           {/* List Genre */}
