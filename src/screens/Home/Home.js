@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, Image, Animated, StyleSheet, StatusBar, ImageBackground, FlatList, Dimensions, TouchableOpacity, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
 import { fetchComicsList, fetchGenresList, fetchCurrentReading } from '../../api/api';
@@ -8,6 +7,7 @@ import ComicItem from '../../components/HighlightComic';
 import ComicGerne from '../../components/ComicGerne';
 import { BlurView } from 'expo-blur';
 import MyCarousel from '../../components/continueRead';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -32,9 +32,11 @@ const Home = () => {
     });
   }, []);
 
-  useEffect(() => {
-    fetchCurrentReading().then(setCurrentReading);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchCurrentReading().then(setCurrentReading);
+    }, [])
+  );
 
   const handlePress = (comicId) => {
     navigation.navigate('Chapters', { comicId });
