@@ -77,14 +77,7 @@ const Chapters = () => {
             <Text style={styles.comicAuthor}>Author: {comicsList.Author}</Text>
             <Text style={styles.comicInfo}>Genre: {comicsList.Genre}</Text>
           </View>
-          {isRead && (
-            <>
-              <Text style={styles.Chapters}>Continue Reading:</Text>
-              <TouchableOpacity style={[styles.chapterItem, { marginHorizontal: 20 }]}>
-                <Text style={styles.chapterTitle}>item</Text>
-              </TouchableOpacity>
-            </>
-          )}
+          
           <Text style={styles.Chapters}>Chapters:</Text>
           <FlatList
             contentContainerStyle={styles.scrollContent}

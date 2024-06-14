@@ -70,31 +70,34 @@ const Home = () => {
     itemVisiblePercentThreshold: 50,
   };
 
-  return (
-    <ImageBackground
-      source={require('../../assets/background.jpg')}
-      style={styles.background}
-    >
-      <View style={styles.container}>
-        <StatusBar translucent backgroundColor="rgba(29, 29, 29, 0.9)" />
-        <Animated.View style={[styles.safe, { height: safeHeight }]}>
-          <BlurView intensity={50} style={styles.blurView} />
-        </Animated.View>
-        <Animated.View style={[styles.topNav, { transform: [{ translateY: topNavTranslateY }] }]}>
-          <Image style={styles.navLogo} source={require('../../assets/imglogo.png')} />
-          <Image style={styles.navLogotext} source={require('../../assets/applogo.png')} />
-          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-            <Image style={styles.navProfile} source={require('../../assets/img1.png')} />
-          </TouchableOpacity>
-        </Animated.View>
-        <Animated.ScrollView
-          contentContainerStyle={styles.scrollContent}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false }
-          )}
-          scrollEventThrottle={16}
-        >
+  const renderGenre = ({ item }) => (
+    <View style={styles.continueRead}>
+      <Text style={styles.continueReadTitle}>
+        {item.Genre}
+      </Text>
+      <FlatList
+        data={item.comics}
+        renderItem={({ item }) => item ? <ComicGerne item={item} /> : null}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        decelerationRate="fast"
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.horizontalScroll2}
+        initialNumToRender={10}
+      />
+    </View>
+  );
+
+  const mainFlatListData = [
+    { type: 'highlight' },
+    { type: 'currentReading' },
+    ...genresList.map(genre => ({ type: 'genre', genre })),
+  ];
+
+  const renderMainFlatListItem = ({ item }) => {
+    switch (item.type) {
+      case 'highlight':
+        return (
           <View style={styles.hotTrend}>
             <FlatList
               data={comicsList}
@@ -114,37 +117,51 @@ const Home = () => {
               <Text style={styles.readButtonText}>Read</Text>
             </TouchableOpacity>
           </View>
+        );
+      case 'currentReading':
+        return (
           <View style={styles.continueRead}>
             <Text style={styles.continueReadTitle}>
               CONTINUE READING
             </Text>
             <MyCarousel data={currentReading} />
           </View>
+        );
+      case 'genre':
+        return renderGenre({ item: item.genre });
+      default:
+        return null;
+    }
+  };
 
-          {/* List Genre */}
-          <FlatList
-            data={genresList}
-            renderItem={({ item }) => (
-              <View style={styles.continueRead}>
-                <Text style={styles.continueReadTitle}>
-                  {item.Genre}
-                </Text>
-                <FlatList
-                  data={item.comics}
-                  renderItem={({ item }) => item ? <ComicGerne item={item} /> : null}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  decelerationRate="fast"
-                  keyExtractor={item => item.id}
-                  contentContainerStyle={styles.horizontalScroll2}
-                  initialNumToRender={10}
-                />
-              </View>
-            )}
-            keyExtractor={item => item.id}
-            // Thêm khoảng cách dưới
-          />
-        </Animated.ScrollView>
+  return (
+    <ImageBackground
+      source={require('../../assets/background.jpg')}
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        <StatusBar translucent backgroundColor="rgba(29, 29, 29, 0.9)" />
+        <Animated.View style={[styles.safe, { height: safeHeight }]}>
+          <BlurView intensity={50} style={styles.blurView} />
+        </Animated.View>
+        <Animated.View style={[styles.topNav, { transform: [{ translateY: topNavTranslateY }] }]}>
+          <Image style={styles.navLogo} source={require('../../assets/imglogo.png')} />
+          <Image style={styles.navLogotext} source={require('../../assets/applogo.png')} />
+          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+            <Image style={styles.navProfile} source={require('../../assets/user.png')} />
+          </TouchableOpacity>
+        </Animated.View>
+        <Animated.FlatList
+          data={mainFlatListData}
+          renderItem={renderMainFlatListItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.scrollContent}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          scrollEventThrottle={16}
+        />
         <Animated.View style={[styles.bottomNav, { transform: [{ translateY: bottomNavTranslateY }] }]}>
           <HomeBottomNavigation currentRoute="Home" />
         </Animated.View>

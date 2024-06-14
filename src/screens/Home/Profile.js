@@ -79,7 +79,7 @@ const Profile = () => {
           </View>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.infoSpace}>
-                <Image style={styles.avatar} source={require('../../assets/img1.png')}/>
+                <Image style={styles.avatar} source={require('../../assets/user.png')}/>
                 <Text style={styles.userName}>{userName}</Text>
                 <TouchableOpacity style={styles.editButton} onPress={() => setModalVisible(true)}>
                     <Text style={[styles.userName,{fontSize:16},{marginTop:0},{fontWeight:'bold'}]}>Edit</Text>
@@ -129,7 +129,7 @@ const Profile = () => {
         >
           <View style={[styles.modalContent, { transform: [{ translateY }] }]}>
             <View style={styles.modalHandle} />
-            <Image style={styles.avatar} source={require('../../assets/img1.png')}/>
+            <Image style={styles.avatar} source={require('../../assets/user.png')}/>
             <Text style={styles.modalText}>{userName}</Text>
             {/* Thêm các thành phần khác cho bảng thông tin của bạn ở đây */}
           </View>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, SafeAreaView, Image, StyleSheet, Platform, Text, Dimensions, TouchableOpacity, StatusBar, ImageBackground, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, SafeAreaView, Image, StyleSheet, Platform, Text, Dimensions, TouchableOpacity, StatusBar, ImageBackground, FlatList } from 'react-native';
 
 const items = [
   { id: '1', title: 'Discover high-quality free comics!' },
@@ -14,10 +14,24 @@ const items = [
   { id: '10', title: 'Smooth reading experience, no ads!' },
 ];
 
-
 const { width, height } = Dimensions.get('window');
 
 const SignIn = ({ navigation }) => {
+  const flatListRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex(prevIndex => {
+        const nextIndex = (prevIndex + 1) % items.length;
+        flatListRef.current.scrollToIndex({ animated: true, index: nextIndex });
+        return nextIndex;
+      });
+    }, 3000); // 5000ms = 5s
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <ImageBackground 
       source={require('../../assets/background.jpg')} 
@@ -40,19 +54,21 @@ const SignIn = ({ navigation }) => {
             </View>
           </View>
           <View style={styles.body}>
-            <ScrollView 
+            <FlatList 
+              ref={flatListRef}
+              data={items}
               horizontal
-              snapToInterval={width}
-              decelerationRate="fast"
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.scrollContent}
-            >
-              {items.map(item => (
+              keyExtractor={item => item.id}
+              renderItem={({ item }) => (
                 <View key={item.id} style={styles.item}>
                   <Text style={styles.itemText}>{item.title}</Text>
                 </View>
-              ))}
-            </ScrollView>
+              )}
+              snapToInterval={width}
+              decelerationRate="normal"
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContent}
+            />
           </View>
           <View style={styles.botNav}>
             <TouchableOpacity style={styles.botNav_Button} onPress={() => navigation.navigate('SignInForm')}>
@@ -131,8 +147,8 @@ const styles = StyleSheet.create({
   },
   itemText: {
     color: '#fff',
-    fontSize:30,
-    fontWeight:'bold'
+    fontSize: 30,
+    fontWeight: 'bold',
   },
   botNav: {
     width: width,
