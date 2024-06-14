@@ -1,11 +1,19 @@
 import React from 'react';
-import { View, SafeAreaView, Image, StyleSheet, Platform, FlatList, Text, Dimensions, TouchableOpacity, StatusBar, ImageBackground } from 'react-native';
+import { View, SafeAreaView, Image, StyleSheet, Platform, Text, Dimensions, TouchableOpacity, StatusBar, ImageBackground, ScrollView } from 'react-native';
 
-const images = [
-  { id: '1', src: require('../../assets/img1.png') },
-  { id: '2', src: require('../../assets/img2.png') },
-  { id: '3', src: require('../../assets/img3.png') },
+const items = [
+  { id: '1', title: 'Discover high-quality free comics!' },
+  { id: '2', title: 'Experience the best reading ever!' },
+  { id: '3', title: 'Unlimited reading, anytime, anywhere!' },
+  { id: '4', title: 'A rich collection of genres to explore!' },
+  { id: '5', title: 'Daily updates, never miss a chapter!' },
+  { id: '6', title: 'User-friendly interface, easy to use!' },
+  { id: '7', title: 'Save your favorite stories, read offline!' },
+  { id: '8', title: 'Customize your reading experience!' },
+  { id: '9', title: 'Join a vibrant community of readers!' },
+  { id: '10', title: 'Smooth reading experience, no ads!' },
 ];
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,7 +27,9 @@ const SignIn = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
           <StatusBar />
           <View style={styles.topNav}>
-            <Image source={require('../../assets/imglogo.png')} style={styles.Img} />
+            <View style={styles.ImgPlaceholder}>
+              <Image source={require('../../assets/imglogo.png')} style={styles.Img} />            
+            </View>
             <View style={styles.topNavSup}>
               <TouchableOpacity style={styles.topNavSup_Button}>
                 <Text style={styles.topNavSup_Text}>Privacy</Text>
@@ -30,19 +40,19 @@ const SignIn = ({ navigation }) => {
             </View>
           </View>
           <View style={styles.body}>
-            <FlatList
-              style={styles.listImg}
-              data={images}
+            <ScrollView 
               horizontal
-              keyExtractor={item => item.id}
-              renderItem={({ item }) => (
-                <Image source={item.src} style={styles.image} />
-              )}
               snapToInterval={width}
               decelerationRate="fast"
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.flatListContent}
-            />
+              contentContainerStyle={styles.scrollContent}
+            >
+              {items.map(item => (
+                <View key={item.id} style={styles.item}>
+                  <Text style={styles.itemText}>{item.title}</Text>
+                </View>
+              ))}
+            </ScrollView>
           </View>
           <View style={styles.botNav}>
             <TouchableOpacity style={styles.botNav_Button} onPress={() => navigation.navigate('SignInForm')}>
@@ -81,6 +91,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  ImgPlaceholder: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+  },
+  Img: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
   topNavSup: {
     flexDirection: 'row',
   },
@@ -95,11 +117,27 @@ const styles = StyleSheet.create({
     height: height - 300,
     alignItems: 'center',
   },
+  scrollContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  item: {
+    width: width - 40,
+    marginHorizontal: 20,
+    padding: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  itemText: {
+    color: '#fff',
+    fontSize:30,
+    fontWeight:'bold'
+  },
   botNav: {
     width: width,
     marginBottom: 10,
     justifyContent: 'center',
-
     alignItems: 'center',
   },
   botNav_Button: {
@@ -126,17 +164,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
     fontSize: 18,
-  },
-  Img: {
-    width: 30,
-    height: 30,
-  },
-  image: {
-    width: width,
-    height: height,
-  },
-  flatListContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
