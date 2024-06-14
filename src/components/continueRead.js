@@ -9,8 +9,12 @@ const MyCarousel = ({ data }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigation = useNavigation();
 
+  const handleContinueReadingPress = (comicId) => {
+    navigation.navigate('Chapters', { comicId });
+  };
+
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.comicItem} onPress={() => navigation.navigate('Chapters', { comicId: item.id })}>
+    <TouchableOpacity style={styles.comicItem} onPress={() => handleContinueReadingPress(item.comicId)}>
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: item.ImgURL }}

@@ -8,7 +8,7 @@ import Modal from 'react-native-modal';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import { auth } from '../../../firebaseConfig';
-// import {My}
+import MyCarousel from '../../components/continueRead';
 
 const { width } = Dimensions.get('window');
 
@@ -65,23 +65,6 @@ const Profile = () => {
     navigation.navigate('SignIn'); // Điều hướng đến màn hình đăng nhập
   };
 
-  const handleContinueReadingPress = (comicId) => {
-    navigation.navigate('Chapters', { comicId });
-  };
-  const renderReadingItem = ({ item }) => (
-    <TouchableOpacity style={styles.comicItem} onPress={() => handleContinueReadingPress(item.comicId)}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: item.ImgURL }}
-          style={styles.coverImage}
-        />
-      </View>
-      <View style={styles.comicInfo}>
-        <Text style={styles.comicTitle}>{item.Title}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
   return (
     <ImageBackground 
       source={require('../../assets/background.jpg')} 
@@ -105,7 +88,7 @@ const Profile = () => {
 
             <View style={styles.continueRead}>
               <Text style={styles.continueReadTitle}>CONTINUE READING</Text>
-                <FlatList
+                {/* <FlatList
                   data={currentReading}
                   renderItem={renderReadingItem}
                   keyExtractor={(item) => item.comicId}
@@ -114,7 +97,8 @@ const Profile = () => {
                   decelerationRate="normal"
                   contentContainerStyle={styles.horizontalScroll2}
                   initialNumToRender={10}
-                />
+                /> */}
+                <MyCarousel data={currentReading}/>
             </View>
 
             <View style={styles.continueRead}>
@@ -261,36 +245,5 @@ const styles = StyleSheet.create({
     height: 20,
     width: 20,
     tintColor: 'white', // Đảm bảo biểu tượng có màu trắng
-  },
-  comicItem: {
-    backgroundColor: 'transparent',
-    borderRadius: 15,
-    flexDirection: 'column',
-    padding: 10,
-    height: 300, // Cố định chiều cao của mục truyện tranh
-    width: 150,
-  },
-  imageContainer: {
-    borderRadius: 10,
-    width: '100%',
-    height: 200, // Cố định chiều cao của khung hình ảnh
-    alignItems: 'center',
-    shadowOpacity: 0.3,
-    justifyContent: 'flex-end',
-    shadowRadius: 12,
-    elevation: 10,
-  },
-  coverImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10,
-  },
-  comicInfo: {
-    marginTop: 10,
-    alignItems: 'flex-start',
-  },
-  comicTitle: {
-    color: 'white',
-    fontSize: 18,
   },
 });
