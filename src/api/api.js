@@ -76,7 +76,6 @@ const fetchChapterPdfUrls = async (comicId, chapterId) => {
         const storageRef = storage.refFromURL(content); // Tạo tham chiếu từ URL
         return await storageRef.getDownloadURL(); // Lấy URL tải xuống
       }));
-      console.log('Number of URLs:', urls.length);
       return urls; // Trả về mảng URL tải xuống
     } else {
       return [];

@@ -3,50 +3,45 @@ import { View, StyleSheet, Dimensions, FlatList, Text } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import ChapterPagesNavigation from '../../navigations/ChapterPagesNavigation';
-import { fetchChapterPdfUrls } from '../../api/api';
+import { fetchChapterPdfUrls, fetchChapters } from '../../api/api';
 
 const { width, height } = Dimensions.get('window');
 
 const ChapterPages = () => {
   const route = useRoute();
   const { comicId, chapterId } = route.params;
-  const [pdfSource, setPdfSource] = useState(null);
-  const [currentChapter, setCurrentChapter] = useState(`Chapter ${chapterId}`);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [currentChapter, setCurrentChapter] = useState(chapterId);
   const [urls, setPdfUrls] = useState([]);
+  const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const chapters = Array.from({ length: 10 }, (_, i) => `Chapter ${i + 1}`); // Mảng giả với 10 chương
 
   useEffect(() => {
-    fetchChapterPdf(comicId, chapterId).then((data) => {
-      setPdfSource(data);
-    });
-  }, [comicId, chapterId]);
+    const loadChapters = async () => {
+      const chaptersList = await fetchChapters(comicId);
+      setChapters(chaptersList);
+    };
+
+    loadChapters();
+  }, [comicId]);
 
   useEffect(() => {
     const loadPages = async () => {
-      const url = await fetchChapterPdfUrls(comicId, chapterId);
-      console.log('PDF URLs:', url); // Kiểm tra chiều dài của mảng URLs
+      const url = await fetchChapterPdfUrls(comicId, currentChapter);
       setPdfUrls(url);
       setLoading(false);
     };
     loadPages();
-  }, [comicId, chapterId]);
+  }, [comicId, currentChapter]);
 
-  const handleChapterChange = (chapter) => {
-    const chapterIndex = chapters.indexOf(chapter) + 1;
-    setCurrentChapter(chapter);
-    fetchChapterPdf(comicId, chapterIndex).then((data) => {
-      setPdfSource(data);
-    });
-  };
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode); // Chuyển đổi chế độ nền
+  const handleChapterChange = (chapterIndex) => {
+    const chapter = chapters[chapterIndex];
+    if (chapter) {
+      setCurrentChapter(chapter.id);
+    }
   };
 
   return (
-    <View style={[styles.container, isDarkMode ? styles.darkBackground : styles.lightBackground]}>
+    <View style={[styles.container, styles.lightBackground]}>
       {loading ? (
         <Text>Loading...</Text>
       ) : urls.length > 0 ? (
@@ -64,9 +59,7 @@ const ChapterPages = () => {
         <ChapterPagesNavigation
           chapters={chapters}
           currentChapter={currentChapter}
-          onChapterChange={(newChapter) => handleChapterChange(newChapter)}
-          onToggleDarkMode={toggleDarkMode}
-          isDarkMode={isDarkMode}
+          onChapterChange={handleChapterChange}
         />
       </View>
     </View>
@@ -94,14 +87,4 @@ const styles = StyleSheet.create({
   lightBackground: {
     backgroundColor: 'white',
   },
-  darkBackground: {
-    backgroundColor: 'black',
-  },
 });
-
-// Mock function to fetch PDF source URL
-const fetchChapterPdf = async (comicId, chapterId) => {
-  // Replace this with your actual logic to fetch the PDF URL
-  // Here we use a placeholder PDF file for demonstration
-  return '';
-};

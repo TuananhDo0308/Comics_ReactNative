@@ -2,22 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions, Image, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
-import { useColorScheme } from 'react-native';
+// import { useColorScheme } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
-const ChapterPagesNavigation = ({ chapters, currentChapter, onChapterChange, onToggleDarkMode, isDarkMode }) => {
+const ChapterPagesNavigation = ({ chapters, currentChapter, onChapterChange }) => {
   const navigation = useNavigation();
   const [selectedChapter, setSelectedChapter] = useState(currentChapter);
-  const colorScheme = useColorScheme();
+  // const colorScheme = useColorScheme();
 
   useEffect(() => {
     setSelectedChapter(currentChapter);
   }, [currentChapter]);
 
-  const handleChapterChange = (chapter) => {
-    setSelectedChapter(chapter);
-    onChapterChange(chapter);
+  const handlePreviousChapter = () => {
+    const currentIndex = chapters.findIndex(chapter => chapter.id === selectedChapter);
+    if (currentIndex > 0) {
+      onChapterChange(currentIndex - 1);
+    }
+  };
+
+  const handleNextChapter = () => {
+    const currentIndex = chapters.findIndex(chapter => chapter.id === selectedChapter);
+    if (currentIndex < chapters.length - 1) {
+      onChapterChange(currentIndex + 1);
+    }
   };
 
   return (
@@ -26,20 +35,10 @@ const ChapterPagesNavigation = ({ chapters, currentChapter, onChapterChange, onT
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.goBack()}>
           <Image style={styles.image} source={require('../assets/icon/closeIcon.png')} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => {
-          const index = chapters.indexOf(selectedChapter);
-          if (index > 0) {
-            handleChapterChange(chapters[index - 1]);
-          }
-        }}>
+        <TouchableOpacity style={styles.navButton} onPress={handleNextChapter}>
           <Image style={styles.image} source={require('../assets/icon/backIcon.png')} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => {
-          const index = chapters.indexOf(selectedChapter);
-          if (index < chapters.length - 1) {
-            handleChapterChange(chapters[index + 1]);
-          }
-        }}>
+        <TouchableOpacity style={styles.navButton} onPress={handlePreviousChapter}>
           <Image style={[styles.image, styles.imageRotate]} source={require('../assets/icon/backIcon.png')} />
         </TouchableOpacity>
         
