@@ -5,7 +5,7 @@ import { fetchChapters, fetchComicsList, addToCurrentReading } from '../../api/a
 import { BlurView } from 'expo-blur';
 import Constants from 'expo-constants';
 import { auth, db } from '../../../firebaseConfig'
-import { toggleFavoriteComic, updateCurrentReading } from '../../api/api';
+import { toggleFavoriteComic, fetchCurrentReading } from '../../api/api';
 
 const { width, height } = Dimensions.get('window');
 

@@ -128,6 +128,7 @@ const fetchFavoriteComics = async () => {
   return [];
 };
 
+// Hàm để thêm truyện vào danh sách đang đọc
 const addToCurrentReading = async (comicId) => {
   const user = auth.currentUser;
   if (user) {

@@ -7,6 +7,8 @@ import HomeBottomNavigation from '../../navigations/HomeBottomNavigation';
 import Modal from 'react-native-modal';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import { auth } from '../../../firebaseConfig';
+// import {My}
 
 const { width } = Dimensions.get('window');
 
@@ -17,6 +19,7 @@ const Profile = () => {
   const [currentComicId, setCurrentComicId] = useState(null);
   const [currentReading, setCurrentReading] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [userName, setUserName] = useState('');
   const [translateY, setTranslateY] = useState(0);
   const navigation = useNavigation();
 
@@ -32,6 +35,13 @@ const Profile = () => {
   useEffect(() => {
     fetchFavoriteComics().then(setFavoriteComics);
     fetchCurrentReading().then(setCurrentReading);
+
+    const user = auth.currentUser;
+    if (user) {
+      const email = user.email;
+      const name = email.split('@')[0]; // Lấy phần trước '@'
+      setUserName(name);
+    }
   }, []);
 
 
@@ -55,6 +65,23 @@ const Profile = () => {
     navigation.navigate('SignIn'); // Điều hướng đến màn hình đăng nhập
   };
 
+  const handleContinueReadingPress = (comicId) => {
+    navigation.navigate('Chapters', { comicId });
+  };
+  const renderReadingItem = ({ item }) => (
+    <TouchableOpacity style={styles.comicItem} onPress={() => handleContinueReadingPress(item.comicId)}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: item.ImgURL }}
+          style={styles.coverImage}
+        />
+      </View>
+      <View style={styles.comicInfo}>
+        <Text style={styles.comicTitle}>{item.Title}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <ImageBackground 
       source={require('../../assets/background.jpg')} 
@@ -70,7 +97,7 @@ const Profile = () => {
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.infoSpace}>
                 <Image style={styles.avatar} source={require('../../assets/img1.png')}/>
-                <Text style={styles.userName}>TuananhDo</Text>
+                <Text style={styles.userName}>{userName}</Text>
                 <TouchableOpacity style={styles.editButton} onPress={() => setModalVisible(true)}>
                     <Text style={[styles.userName,{fontSize:16},{marginTop:0},{fontWeight:'bold'}]}>Edit</Text>
                 </TouchableOpacity>
@@ -80,7 +107,7 @@ const Profile = () => {
               <Text style={styles.continueReadTitle}>CONTINUE READING</Text>
                 <FlatList
                   data={currentReading}
-                  renderItem={({ item }) => item ? <ComicGerne item={item} /> : null}
+                  renderItem={renderReadingItem}
                   keyExtractor={(item) => item.comicId}
                   horizontal
                   showsHorizontalScrollIndicator={false}
@@ -119,7 +146,7 @@ const Profile = () => {
           <View style={[styles.modalContent, { transform: [{ translateY }] }]}>
             <View style={styles.modalHandle} />
             <Image style={styles.avatar} source={require('../../assets/img1.png')}/>
-            <Text style={styles.modalText}>Name</Text>
+            <Text style={styles.modalText}>{userName}</Text>
             {/* Thêm các thành phần khác cho bảng thông tin của bạn ở đây */}
           </View>
         </PanGestureHandler>
@@ -234,5 +261,36 @@ const styles = StyleSheet.create({
     height: 20,
     width: 20,
     tintColor: 'white', // Đảm bảo biểu tượng có màu trắng
+  },
+  comicItem: {
+    backgroundColor: 'transparent',
+    borderRadius: 15,
+    flexDirection: 'column',
+    padding: 10,
+    height: 300, // Cố định chiều cao của mục truyện tranh
+    width: 150,
+  },
+  imageContainer: {
+    borderRadius: 10,
+    width: '100%',
+    height: 200, // Cố định chiều cao của khung hình ảnh
+    alignItems: 'center',
+    shadowOpacity: 0.3,
+    justifyContent: 'flex-end',
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  coverImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
+  },
+  comicInfo: {
+    marginTop: 10,
+    alignItems: 'flex-start',
+  },
+  comicTitle: {
+    color: 'white',
+    fontSize: 18,
   },
 });
